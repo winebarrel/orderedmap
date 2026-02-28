@@ -33,22 +33,22 @@ func TestLen(t *testing.T) {
 		expected int
 	}{
 		{
-			name:     "set value",
+			name:     "empty",
 			init:     []pair[any]{},
 			expected: 0,
 		},
 		{
-			name:     "set value",
+			name:     "1 item",
 			init:     []pair[any]{{k: "foo", v: "bar"}},
 			expected: 1,
 		},
 		{
-			name:     "set value",
+			name:     "2 items",
 			init:     []pair[any]{{k: "foo", v: "bar"}, {k: "zoo", v: 100}},
 			expected: 2,
 		},
 		{
-			name:     "set value",
+			name:     "3 items",
 			init:     []pair[any]{{k: "foo", v: "bar"}, {k: "zoo", v: 100}, {k: "baz", v: true}},
 			expected: 3,
 		},
