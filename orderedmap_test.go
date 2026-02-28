@@ -401,16 +401,68 @@ func TestPairs(t *testing.T) {
 	}
 }
 
+func TestAll(t *testing.T) {
+	tests := []struct {
+		name     string
+		init     []pair[any]
+		expected []pair[any]
+		abort    bool
+	}{
+		{
+			name:     "all pairs",
+			init:     []pair[any]{{k: "foo", v: "bar"}, {k: "zoo", v: 100}, {k: "baz", v: true}},
+			expected: []pair[any]{{k: "foo", v: "bar"}, {k: "zoo", v: 100}, {k: "baz", v: true}},
+		},
+		{
+			name:     "abort loop",
+			init:     []pair[any]{{k: "foo", v: "bar"}, {k: "zoo", v: 100}, {k: "baz", v: true}},
+			expected: []pair[any]{{k: "foo", v: "bar"}},
+			abort:    true,
+		},
+		{
+			name:     "all pairs (empty)",
+			init:     []pair[any]{},
+			expected: []pair[any]{},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			om := orderedmap.New[string, any]()
+			for _, p := range tt.init {
+				om.Set(p.k, p.v)
+			}
+			for range 10 {
+				pairs := []pair[any]{}
+				for k, v := range om.All() {
+					pairs = append(pairs, pair[any]{k: k, v: v})
+					if tt.abort {
+						break
+					}
+				}
+				assert.Equal(t, tt.expected, pairs)
+			}
+		})
+	}
+}
+
 func TestKeys(t *testing.T) {
 	tests := []struct {
 		name     string
 		init     []pair[any]
 		expected []string
+		abort    bool
 	}{
 		{
 			name:     "all keys",
 			init:     []pair[any]{{k: "foo", v: "bar"}, {k: "zoo", v: 100}, {k: "baz", v: true}},
 			expected: []string{"foo", "zoo", "baz"},
+		},
+		{
+			name:     "abort loop",
+			init:     []pair[any]{{k: "foo", v: "bar"}, {k: "zoo", v: 100}, {k: "baz", v: true}},
+			expected: []string{"foo"},
+			abort:    true,
 		},
 		{
 			name:     "all keys (empty)",
@@ -429,6 +481,9 @@ func TestKeys(t *testing.T) {
 				keys := []string{}
 				for k := range om.Keys() {
 					keys = append(keys, k)
+					if tt.abort {
+						break
+					}
 				}
 				assert.Equal(t, tt.expected, keys)
 			}
@@ -441,11 +496,18 @@ func TestValues(t *testing.T) {
 		name     string
 		init     []pair[any]
 		expected []any
+		abort    bool
 	}{
 		{
 			name:     "all values",
 			init:     []pair[any]{{k: "foo", v: "bar"}, {k: "zoo", v: 100}, {k: "baz", v: true}},
 			expected: []any{"bar", 100, true},
+		},
+		{
+			name:     "abort loop",
+			init:     []pair[any]{{k: "foo", v: "bar"}, {k: "zoo", v: 100}, {k: "baz", v: true}},
+			expected: []any{"bar"},
+			abort:    true,
 		},
 		{
 			name:     "all values (empty)",
@@ -464,6 +526,9 @@ func TestValues(t *testing.T) {
 				values := []any{}
 				for v := range om.Values() {
 					values = append(values, v)
+					if tt.abort {
+						break
+					}
 				}
 				assert.Equal(t, tt.expected, values)
 			}
