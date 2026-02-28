@@ -110,7 +110,7 @@ func (om *OrderedMap[K, V]) Pairs() []Pair[K, V] {
 	om.mu.RLock()
 	defer om.mu.RUnlock()
 
-	pairs := []Pair[K, V]{}
+	pairs := make([]Pair[K, V], 0, om.pairs.Len())
 	for e := om.pairs.Front(); e != nil; e = e.Next() {
 		p := e.Value.(*Pair[K, V])
 		pairs = append(pairs, *p)
