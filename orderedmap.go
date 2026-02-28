@@ -8,7 +8,7 @@ import (
 	"sync"
 )
 
-type OrderedMap[K comparable, V any] struct {
+type Map[K comparable, V any] struct {
 	mu           sync.RWMutex
 	pairs        *list.List
 	elementByKey map[K]*list.Element
@@ -19,8 +19,8 @@ type Pair[K comparable, V any] struct {
 	Value V
 }
 
-func New[K comparable, V any]() *OrderedMap[K, V] {
-	m := &OrderedMap[K, V]{
+func New[K comparable, V any]() *Map[K, V] {
+	m := &Map[K, V]{
 		pairs:        list.New(),
 		elementByKey: map[K]*list.Element{},
 	}
@@ -28,14 +28,14 @@ func New[K comparable, V any]() *OrderedMap[K, V] {
 	return m
 }
 
-func (om *OrderedMap[K, V]) Len() int {
+func (om *Map[K, V]) Len() int {
 	om.mu.RLock()
 	defer om.mu.RUnlock()
 
 	return len(om.elementByKey)
 }
 
-func (om *OrderedMap[K, V]) Set(k K, v V) {
+func (om *Map[K, V]) Set(k K, v V) {
 	om.mu.Lock()
 	defer om.mu.Unlock()
 	p := &Pair[K, V]{Key: k, Value: v}
@@ -48,7 +48,7 @@ func (om *OrderedMap[K, V]) Set(k K, v V) {
 	}
 }
 
-func (om *OrderedMap[K, V]) Push(k K, v V) {
+func (om *Map[K, V]) Push(k K, v V) {
 	om.mu.Lock()
 	defer om.mu.Unlock()
 	p := &Pair[K, V]{Key: k, Value: v}
@@ -61,12 +61,12 @@ func (om *OrderedMap[K, V]) Push(k K, v V) {
 	om.elementByKey[k] = e
 }
 
-func (om *OrderedMap[K, V]) Get(k K) V {
+func (om *Map[K, V]) Get(k K) V {
 	v, _ := om.GetOk(k)
 	return v
 }
 
-func (om *OrderedMap[K, V]) GetOk(k K) (V, bool) {
+func (om *Map[K, V]) GetOk(k K) (V, bool) {
 	om.mu.RLock()
 	defer om.mu.RUnlock()
 
@@ -79,12 +79,12 @@ func (om *OrderedMap[K, V]) GetOk(k K) (V, bool) {
 	}
 }
 
-func (om *OrderedMap[K, V]) Delete(k K) V {
+func (om *Map[K, V]) Delete(k K) V {
 	v, _ := om.DeleteOk(k)
 	return v
 }
 
-func (om *OrderedMap[K, V]) DeleteOk(k K) (V, bool) {
+func (om *Map[K, V]) DeleteOk(k K) (V, bool) {
 	om.mu.Lock()
 	defer om.mu.Unlock()
 
@@ -99,14 +99,14 @@ func (om *OrderedMap[K, V]) DeleteOk(k K) (V, bool) {
 	}
 }
 
-func (om *OrderedMap[K, V]) Clear() {
+func (om *Map[K, V]) Clear() {
 	om.mu.Lock()
 	defer om.mu.Unlock()
 	clear(om.elementByKey)
 	om.pairs.Init()
 }
 
-func (om *OrderedMap[K, V]) Pairs() []Pair[K, V] {
+func (om *Map[K, V]) Pairs() []Pair[K, V] {
 	om.mu.RLock()
 	defer om.mu.RUnlock()
 
@@ -118,7 +118,7 @@ func (om *OrderedMap[K, V]) Pairs() []Pair[K, V] {
 	return pairs
 }
 
-func (om *OrderedMap[K, V]) All() iter.Seq2[K, V] {
+func (om *Map[K, V]) All() iter.Seq2[K, V] {
 	pairs := om.Pairs()
 
 	return func(yield func(K, V) bool) {
@@ -130,7 +130,7 @@ func (om *OrderedMap[K, V]) All() iter.Seq2[K, V] {
 	}
 }
 
-func (om *OrderedMap[K, V]) Keys() iter.Seq[K] {
+func (om *Map[K, V]) Keys() iter.Seq[K] {
 	pairs := om.Pairs()
 
 	return func(yield func(K) bool) {
@@ -142,7 +142,7 @@ func (om *OrderedMap[K, V]) Keys() iter.Seq[K] {
 	}
 }
 
-func (om *OrderedMap[K, V]) Values() iter.Seq[V] {
+func (om *Map[K, V]) Values() iter.Seq[V] {
 	pairs := om.Pairs()
 
 	return func(yield func(V) bool) {
@@ -154,7 +154,7 @@ func (om *OrderedMap[K, V]) Values() iter.Seq[V] {
 	}
 }
 
-func (om *OrderedMap[K, V]) String() string {
+func (om *Map[K, V]) String() string {
 	var buf strings.Builder
 	fmt.Fprintf(&buf, "%T[", om)
 	first := true

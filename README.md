@@ -35,7 +35,7 @@ func main() {
 	om.Set("baz", true)
 
 	fmt.Println(om)
-	//=> *orderedmap.OrderedMap[string,interface {}][foo:bar zoo:100 baz:true]
+	//=> *orderedmap.Map[string,interface {}][foo:bar zoo:100 baz:true]
 
 	// Get a value
 	fmt.Println(om.Get("foo"))
