@@ -590,10 +590,6 @@ func TestConcurrentAccess(t *testing.T) {
 
 			for _, k := range keys {
 				om.Set(k, struct{}{})
-				om.Len()
-			}
-
-			for i := 0; i < 100; i++ {
 				assert.GreaterOrEqual(t, om.Len(), 0)
 			}
 
@@ -601,14 +597,14 @@ func TestConcurrentAccess(t *testing.T) {
 
 			for _, k := range keys {
 				om.Get(k)
-				om.Len()
+				assert.GreaterOrEqual(t, om.Len(), 0)
 			}
 
 			rand.Shuffle(len(keys), func(i, j int) { keys[i], keys[j] = keys[j], keys[i] })
 
 			for _, k := range keys {
 				om.Delete(k)
-				om.Len()
+				assert.GreaterOrEqual(t, om.Len(), 0)
 			}
 
 			wg.Done()
