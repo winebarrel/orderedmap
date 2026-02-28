@@ -585,6 +585,8 @@ func TestConcurrentAccess(t *testing.T) {
 		copy(keys, n)
 		wg.Add(1)
 		go func() {
+			defer wg.Done()
+
 			<-fire
 			rand.Shuffle(len(keys), func(i, j int) { keys[i], keys[j] = keys[j], keys[i] })
 
@@ -606,8 +608,6 @@ func TestConcurrentAccess(t *testing.T) {
 				om.Delete(k)
 				om.Len()
 			}
-
-			wg.Done()
 		}()
 	}
 
