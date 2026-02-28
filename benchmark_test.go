@@ -10,7 +10,7 @@ func BenchmarkSet(b *testing.B) {
 	om := orderedmap.New[int, struct{}]()
 	b.ResetTimer()
 
-	for i := range b.N {
+	for i := 0; i < b.N; i++ {
 		om.Set(i, struct{}{})
 	}
 }
@@ -18,13 +18,13 @@ func BenchmarkSet(b *testing.B) {
 func BenchmarkGet(b *testing.B) {
 	om := orderedmap.New[int, struct{}]()
 
-	for i := range b.N {
+	for i := 0; i < b.N; i++ {
 		om.Set(i, struct{}{})
 	}
 
 	b.ResetTimer()
 
-	for i := range b.N {
+	for i := 0; i < b.N; i++ {
 		om.Get(i)
 	}
 }
@@ -32,13 +32,13 @@ func BenchmarkGet(b *testing.B) {
 func BenchmarkDelete(b *testing.B) {
 	om := orderedmap.New[int, struct{}]()
 
-	for i := range b.N {
+	for i := 0; i < b.N; i++ {
 		om.Set(i, struct{}{})
 	}
 
 	b.ResetTimer()
 
-	for i := range b.N {
+	for i := 0; i < b.N; i++ {
 		om.Delete(i)
 	}
 }
