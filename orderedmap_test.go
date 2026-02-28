@@ -343,11 +343,9 @@ func TestDeleteOK(t *testing.T) {
 
 func TestClear(t *testing.T) {
 	tests := []struct {
-		name           string
-		init           []pair[any]
-		delete         []string
-		expectedMap    []pair[any]
-		expectedValues []any
+		name        string
+		init        []pair[any]
+		expectedMap []pair[any]
 	}{
 		{
 			name:        "clear values",
