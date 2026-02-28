@@ -1,13 +1,12 @@
 package orderedmap_test
 
 import (
-	"context"
 	"math/rand/v2"
+	"sync"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/winebarrel/orderedmap"
-	"golang.org/x/sync/errgroup"
 )
 
 type pair[V any] struct {
@@ -578,13 +577,14 @@ func TestThread(t *testing.T) {
 		n = append(n, i)
 	}
 
-	eg, _ := errgroup.WithContext(context.Background())
+	var wg sync.WaitGroup
 	fire := make(chan struct{})
 
 	for i := 0; i < 100; i++ {
 		keys := make([]int, len(n))
 		copy(keys, n)
-		eg.Go(func() error {
+		wg.Add(1)
+		go func() {
 			<-fire
 			rand.Shuffle(len(keys), func(i, j int) { keys[i], keys[j] = keys[j], keys[i] })
 
@@ -611,11 +611,10 @@ func TestThread(t *testing.T) {
 				om.Len()
 			}
 
-			return nil
-		})
+			wg.Done()
+		}()
 	}
 
 	close(fire)
-	err := eg.Wait()
-	assert.NoError(t, err)
+	wg.Wait()
 }
