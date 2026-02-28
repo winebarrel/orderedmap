@@ -378,7 +378,7 @@ func TestPairs(t *testing.T) {
 			expected: []pair[any]{{k: "foo", v: "bar"}, {k: "zoo", v: 100}, {k: "baz", v: true}},
 		},
 		{
-			name:     "all pairs (empty}",
+			name:     "all pairs (empty)",
 			init:     []pair[any]{},
 			expected: []pair[any]{},
 		},
@@ -413,7 +413,7 @@ func TestKeys(t *testing.T) {
 			expected: []string{"foo", "zoo", "baz"},
 		},
 		{
-			name:     "all keys (empty}",
+			name:     "all keys (empty)",
 			init:     []pair[any]{},
 			expected: []string{},
 		},
@@ -448,7 +448,7 @@ func TestValues(t *testing.T) {
 			expected: []any{"bar", 100, true},
 		},
 		{
-			name:     "all values (empty}",
+			name:     "all values (empty)",
 			init:     []pair[any]{},
 			expected: []any{},
 		},
