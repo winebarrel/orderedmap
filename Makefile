@@ -7,7 +7,7 @@ vet:
 
 .PHONY: test
 test:
-	go test -v ./... $(TEST_OPTS)
+	go test -v -count=1 ./... $(TEST_OPTS)
 
 .PHONY: bench
 bench:
