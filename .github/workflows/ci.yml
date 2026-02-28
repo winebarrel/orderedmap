@@ -24,3 +24,18 @@ jobs:
       - uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
+  bench:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-go@v6
+        with:
+          go-version-file: go.mod
+      - name: Run benchmark
+        run: |
+          make bench | tee bench.log
+          echo '### Benchmark results' >> $GITHUB_STEP_SUMMARY
+          echo '```'                   >> $GITHUB_STEP_SUMMARY
+          go version                   >> $GITHUB_STEP_SUMMARY
+          cat bench.log                >> $GITHUB_STEP_SUMMARY
+          echo '```'                   >> $GITHUB_STEP_SUMMARY
