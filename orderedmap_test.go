@@ -1,6 +1,8 @@
 package orderedmap_test
 
 import (
+	"math/rand/v2"
+	"sync"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -565,4 +567,50 @@ func TestString(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestConcurrentAccess(t *testing.T) {
+	om := orderedmap.New[int, struct{}]()
+
+	n := []int{}
+	for i := 0; i < 10000; i++ {
+		n = append(n, i)
+	}
+
+	var wg sync.WaitGroup
+	fire := make(chan struct{})
+
+	for i := 0; i < 100; i++ {
+		keys := make([]int, len(n))
+		copy(keys, n)
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+
+			<-fire
+			rand.Shuffle(len(keys), func(i, j int) { keys[i], keys[j] = keys[j], keys[i] })
+
+			for _, k := range keys {
+				om.Set(k, struct{}{})
+				om.Len()
+			}
+
+			rand.Shuffle(len(keys), func(i, j int) { keys[i], keys[j] = keys[j], keys[i] })
+
+			for _, k := range keys {
+				om.Get(k)
+				om.Len()
+			}
+
+			rand.Shuffle(len(keys), func(i, j int) { keys[i], keys[j] = keys[j], keys[i] })
+
+			for _, k := range keys {
+				om.Delete(k)
+				om.Len()
+			}
+		}()
+	}
+
+	close(fire)
+	wg.Wait()
 }
