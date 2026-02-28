@@ -116,7 +116,7 @@ func TestPush(t *testing.T) {
 			expected: []pair[any]{{k: "foo", v: "bar"}, {k: "zoo", v: 100}, {k: "baz", v: true}},
 		},
 		{
-			name:     "set exists value",
+			name:     "push exists value",
 			init:     []pair[any]{{k: "zoo", v: 100}, {k: "baz", v: true}},
 			push:     []pair[any]{{k: "foo", v: "bar"}, {k: "zoo", v: 200}, {k: "baz", v: false}, {k: "hoge", v: "fuga"}},
 			expected: []pair[any]{{k: "foo", v: "bar"}, {k: "zoo", v: 200}, {k: "baz", v: false}, {k: "hoge", v: "fuga"}},
