@@ -20,4 +20,7 @@ jobs:
           go-version-file: go.mod
           cache: false
       - uses: golangci/golangci-lint-action@v9
-      - run: make
+      - run: make TEST_OPTS='-race -coverprofile=coverage.txt'
+      - uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}

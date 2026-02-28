@@ -7,7 +7,7 @@ vet:
 
 .PHONY: test
 test:
-	go test -race -v ./...
+	go test -v ./... $(TEST_OPTS)
 
 .PHONY: lint
 lint:
