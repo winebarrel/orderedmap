@@ -569,7 +569,7 @@ func TestString(t *testing.T) {
 	}
 }
 
-func TestThread(t *testing.T) {
+func TestConcurrentAccess(t *testing.T) {
 	om := orderedmap.New[int, struct{}]()
 
 	n := []int{}
