@@ -73,6 +73,11 @@ func main() {
 	//   baz true
 	//   foo new_bar
 
+	// Get all key-value pairs as a slice
+	pairs := om.Pairs()
+	fmt.Println(pairs)
+	//=> [{zoo 100} {baz true} {foo new_bar}]
+
 	// Delete a key
 	om.Delete("zoo")
 
