@@ -106,14 +106,14 @@ func (om *OrderedMap[K, V]) Clear() {
 	om.pairs.Init()
 }
 
-func (om *OrderedMap[K, V]) Pairs() []*Pair[K, V] {
+func (om *OrderedMap[K, V]) Pairs() []Pair[K, V] {
 	om.mu.RLock()
 	defer om.mu.RUnlock()
 
-	pairs := []*Pair[K, V]{}
+	pairs := []Pair[K, V]{}
 	for e := om.pairs.Front(); e != nil; e = e.Next() {
 		p := e.Value.(*Pair[K, V])
-		pairs = append(pairs, p)
+		pairs = append(pairs, *p)
 	}
 	return pairs
 }
