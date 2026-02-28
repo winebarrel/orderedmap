@@ -64,6 +64,15 @@ func main() {
 		fmt.Println(v)
 	}
 
+	// Push moves an existing key to the back
+	om.Push("foo", "new_bar")
+	for k, v := range om.All() {
+		fmt.Println(k, v)
+	}
+	//=> zoo 100
+	//   baz true
+	//   foo new_bar
+
 	// Delete a key
 	om.Delete("zoo")
 
