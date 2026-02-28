@@ -119,12 +119,10 @@ func (om *OrderedMap[K, V]) Pairs() []*Pair[K, V] {
 }
 
 func (om *OrderedMap[K, V]) All() iter.Seq2[K, V] {
-	om.mu.RLock()
-	defer om.mu.RUnlock()
+	pairs := om.Pairs()
 
 	return func(yield func(K, V) bool) {
-		for e := om.pairs.Front(); e != nil; e = e.Next() {
-			p := e.Value.(*Pair[K, V])
+		for _, p := range pairs {
 			if !yield(p.Key, p.Value) {
 				return
 			}
@@ -133,12 +131,10 @@ func (om *OrderedMap[K, V]) All() iter.Seq2[K, V] {
 }
 
 func (om *OrderedMap[K, V]) Keys() iter.Seq[K] {
-	om.mu.RLock()
-	defer om.mu.RUnlock()
+	pairs := om.Pairs()
 
 	return func(yield func(K) bool) {
-		for e := om.pairs.Front(); e != nil; e = e.Next() {
-			p := e.Value.(*Pair[K, V])
+		for _, p := range pairs {
 			if !yield(p.Key) {
 				return
 			}
@@ -147,12 +143,10 @@ func (om *OrderedMap[K, V]) Keys() iter.Seq[K] {
 }
 
 func (om *OrderedMap[K, V]) Values() iter.Seq[V] {
-	om.mu.RLock()
-	defer om.mu.RUnlock()
+	pairs := om.Pairs()
 
 	return func(yield func(V) bool) {
-		for e := om.pairs.Front(); e != nil; e = e.Next() {
-			p := e.Value.(*Pair[K, V])
+		for _, p := range pairs {
 			if !yield(p.Value) {
 				return
 			}
