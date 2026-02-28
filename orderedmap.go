@@ -20,8 +20,6 @@ type Pair[K comparable, V any] struct {
 }
 
 func New[K comparable, V any]() *OrderedMap[K, V] {
-	list.New()
-
 	m := &OrderedMap[K, V]{
 		pairs:        list.New(),
 		elementByKey: map[K]*list.Element{},
