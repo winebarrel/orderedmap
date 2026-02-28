@@ -1,10 +1,13 @@
 package orderedmap_test
 
 import (
+	"context"
+	"math/rand/v2"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/winebarrel/orderedmap"
+	"golang.org/x/sync/errgroup"
 )
 
 type pair[V any] struct {
@@ -565,4 +568,54 @@ func TestString(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestThread(t *testing.T) {
+	om := orderedmap.New[int, struct{}]()
+
+	n := []int{}
+	for i := 0; i < 10000; i++ {
+		n = append(n, i)
+	}
+
+	eg, _ := errgroup.WithContext(context.Background())
+	fire := make(chan struct{})
+
+	for i := 0; i < 100; i++ {
+		keys := make([]int, len(n))
+		copy(keys, n)
+		eg.Go(func() error {
+			<-fire
+			rand.Shuffle(len(keys), func(i, j int) { keys[i], keys[j] = keys[j], keys[i] })
+
+			for _, k := range keys {
+				om.Set(k, struct{}{})
+				om.Len()
+			}
+
+			for i := 0; i < 100; i++ {
+				assert.GreaterOrEqual(t, om.Len(), 0)
+			}
+
+			rand.Shuffle(len(keys), func(i, j int) { keys[i], keys[j] = keys[j], keys[i] })
+
+			for _, k := range keys {
+				om.Get(k)
+				om.Len()
+			}
+
+			rand.Shuffle(len(keys), func(i, j int) { keys[i], keys[j] = keys[j], keys[i] })
+
+			for _, k := range keys {
+				om.Delete(k)
+				om.Len()
+			}
+
+			return nil
+		})
+	}
+
+	close(fire)
+	err := eg.Wait()
+	assert.NoError(t, err)
 }
