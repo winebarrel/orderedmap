@@ -17,7 +17,7 @@ type expectedOk struct {
 	ok bool
 }
 
-func mapToPairs[V any](t *testing.T, om *orderedmap.OrderedMap[string, V]) []pair[V] {
+func mapToPairs[V any](t *testing.T, om *orderedmap.Map[string, V]) []pair[V] {
 	t.Helper()
 	pairs := []pair[V]{}
 	for k, v := range om.All() {
