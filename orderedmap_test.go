@@ -545,12 +545,12 @@ func TestString(t *testing.T) {
 		{
 			name:     "map to string",
 			init:     []pair[any]{{k: "foo", v: "bar"}, {k: "zoo", v: 100}, {k: "baz", v: true}},
-			expected: `*orderedmap.OrderedMap[string,interface {}][foo:bar zoo:100 baz:true]`,
+			expected: `*orderedmap.Map[string,interface {}][foo:bar zoo:100 baz:true]`,
 		},
 		{
 			name:     "empty map to string",
 			init:     []pair[any]{},
-			expected: `*orderedmap.OrderedMap[string,interface {}][]`,
+			expected: `*orderedmap.Map[string,interface {}][]`,
 		},
 	}
 
