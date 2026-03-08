@@ -1,6 +1,6 @@
 # orderedmap
 
-[![GitHub tag (latest by date)](https://img.shields.io/github/v/tag/winebarrel/orderedmap)](https://pkg.go.dev/github.com/winebarrel/orderedmap?tab=versions)
+[![GitHub Tag](https://img.shields.io/github/v/tag/winebarrel/orderedmap.svg)](https://pkg.go.dev/github.com/winebarrel/orderedmap?tab=versions)
 [![Go Reference](https://pkg.go.dev/badge/github.com/winebarrel/orderedmap.svg)](https://pkg.go.dev/github.com/winebarrel/orderedmap)
 [![CI](https://github.com/winebarrel/orderedmap/actions/workflows/ci.yml/badge.svg)](https://github.com/winebarrel/orderedmap/actions/workflows/ci.yml)
 [![codecov](https://codecov.io/gh/winebarrel/orderedmap/graph/badge.svg)](https://codecov.io/gh/winebarrel/orderedmap)
