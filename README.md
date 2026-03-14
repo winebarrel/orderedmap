@@ -23,6 +23,7 @@ package main
 
 import (
 	"fmt"
+	"slices"
 
 	"github.com/winebarrel/orderedmap"
 )
@@ -87,5 +88,10 @@ func main() {
 
 	// Clear all entries
 	om.Clear()
+
+	// Create from an iterator
+	om2 := orderedmap.From(slices.All([]string{"foo", "bar", "baz"}))
+	fmt.Println(om2)
+	//=> *orderedmap.Map[int,string][0:foo 1:bar 2:baz]
 }
 ```
