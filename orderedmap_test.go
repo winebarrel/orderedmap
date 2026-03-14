@@ -2,6 +2,7 @@ package orderedmap_test
 
 import (
 	"math/rand/v2"
+	"slices"
 	"sync"
 	"testing"
 
@@ -613,4 +614,19 @@ func TestConcurrentAccess(t *testing.T) {
 
 	close(fire)
 	wg.Wait()
+}
+
+func TestFrom(t *testing.T) {
+	s := []string{"foo", "bar", "zoo"}
+
+	om := orderedmap.From(func(yield func(string, int) bool) {
+		slices.Reverse(s)
+		for i, v := range slices.All(s) {
+			if !yield(v, i) {
+				return
+			}
+		}
+	})
+
+	assert.Equal(t, []pair[int]{{k: "zoo", v: 0}, {k: "bar", v: 1}, {k: "foo", v: 2}}, mapToPairs(t, om))
 }
