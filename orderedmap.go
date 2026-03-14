@@ -28,6 +28,16 @@ func New[K comparable, V any]() *Map[K, V] {
 	return om
 }
 
+func From[K comparable, V any](seq iter.Seq2[K, V]) *Map[K, V] {
+	om := New[K, V]()
+
+	for k, v := range seq {
+		om.Set(k, v)
+	}
+
+	return om
+}
+
 func (om *Map[K, V]) Len() int {
 	om.mu.RLock()
 	defer om.mu.RUnlock()
