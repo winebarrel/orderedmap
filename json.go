@@ -8,6 +8,54 @@ import (
 	"fmt"
 )
 
+func (om *Map[K, V]) MarshalJSON() ([]byte, error) {
+	om.mu.RLock()
+	defer om.mu.RUnlock()
+
+	var buf bytes.Buffer
+	buf.WriteByte('{')
+
+	first := true
+	for e := om.entries.Front(); e != nil; e = e.Next() {
+		if !first {
+			buf.WriteByte(',')
+		}
+		first = false
+
+		p := e.Value.(*Pair[K, V])
+
+		var keyBytes []byte
+		if tm, ok := any(p.Key).(encoding.TextMarshaler); ok {
+			text, err := tm.MarshalText()
+			if err != nil {
+				return nil, fmt.Errorf("orderedmap: cannot marshal key: %w", err)
+			}
+			keyBytes, _ = json.Marshal(string(text))
+		} else {
+			var err error
+			keyBytes, err = json.Marshal(p.Key)
+			if err != nil {
+				return nil, fmt.Errorf("orderedmap: cannot marshal key: %w", err)
+			}
+			// Non-string keys (e.g. int) must be wrapped as JSON strings for object keys.
+			if len(keyBytes) > 0 && keyBytes[0] != '"' {
+				keyBytes, _ = json.Marshal(string(keyBytes))
+			}
+		}
+		buf.Write(keyBytes)
+		buf.WriteByte(':')
+
+		valBytes, err := json.Marshal(p.Value)
+		if err != nil {
+			return nil, fmt.Errorf("orderedmap: cannot marshal value: %w", err)
+		}
+		buf.Write(valBytes)
+	}
+
+	buf.WriteByte('}')
+	return buf.Bytes(), nil
+}
+
 func (om *Map[K, V]) UnmarshalJSON(data []byte) error {
 	dec := json.NewDecoder(bytes.NewReader(data))
 
