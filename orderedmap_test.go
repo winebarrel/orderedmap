@@ -695,3 +695,17 @@ func TestSortFunc(t *testing.T) {
 	})
 	assert.Equal(t, []pair[int]{{k: "foo", v: 300}, {k: "bar", v: 200}, {k: "zoo", v: 100}}, mapToPairs(t, om))
 }
+
+func TestClone(t *testing.T) {
+	pairs := []pair[int]{{k: "foo", v: 300}, {k: "bar", v: 200}, {k: "zoo", v: 100}}
+	om := pairsToMap(t, pairs)
+	om2 := om.Clone()
+
+	// cloned map should be a distinct instance
+	assert.NotSame(t, om, om2)
+
+	om.Delete("foo")
+
+	// clone should preserve original key/value pairs and order
+	assert.Equal(t, pairs, mapToPairs(t, om2))
+}

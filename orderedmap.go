@@ -47,6 +47,10 @@ func (om *Map[K, V]) Len() int {
 	return len(om.elementByKey)
 }
 
+func (om *Map[K, V]) Clone() *Map[K, V] {
+	return From(om.All())
+}
+
 func (om *Map[K, V]) Set(k K, v V) {
 	om.mu.Lock()
 	defer om.mu.Unlock()
