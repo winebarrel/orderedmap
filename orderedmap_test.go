@@ -405,7 +405,7 @@ func TestPairs(t *testing.T) {
 			}
 			for range 10 {
 				pairs := []pair[any]{}
-				for _, p := range om.Pairs() {
+				for _, p := range om.Entries() {
 					pairs = append(pairs, pair[any]{k: p.Key, v: p.Value})
 				}
 				assert.Equal(t, tt.expected, pairs)

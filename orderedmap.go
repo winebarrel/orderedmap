@@ -12,7 +12,7 @@ import (
 
 type Map[K comparable, V any] struct {
 	mu           sync.RWMutex
-	pairs        *list.List
+	entries      *list.List
 	elementByKey map[K]*list.Element
 }
 
@@ -23,7 +23,7 @@ type Pair[K comparable, V any] struct {
 
 func New[K comparable, V any]() *Map[K, V] {
 	om := &Map[K, V]{
-		pairs:        list.New(),
+		entries:      list.New(),
 		elementByKey: map[K]*list.Element{},
 	}
 
@@ -60,7 +60,7 @@ func (om *Map[K, V]) set0(k K, v V) {
 	if e, ok := om.elementByKey[k]; ok {
 		e.Value = p
 	} else {
-		e = om.pairs.PushBack(p)
+		e = om.entries.PushBack(p)
 		om.elementByKey[k] = e
 	}
 }
@@ -71,10 +71,10 @@ func (om *Map[K, V]) Push(k K, v V) {
 	p := &Pair[K, V]{Key: k, Value: v}
 
 	if e, ok := om.elementByKey[k]; ok {
-		om.pairs.Remove(e)
+		om.entries.Remove(e)
 	}
 
-	e := om.pairs.PushBack(p)
+	e := om.entries.PushBack(p)
 	om.elementByKey[k] = e
 }
 
@@ -107,7 +107,7 @@ func (om *Map[K, V]) DeleteOk(k K) (V, bool) {
 
 	if e, ok := om.elementByKey[k]; ok {
 		delete(om.elementByKey, k)
-		om.pairs.Remove(e)
+		om.entries.Remove(e)
 		p := e.Value.(*Pair[K, V])
 		return p.Value, true
 	} else {
@@ -120,19 +120,19 @@ func (om *Map[K, V]) Clear() {
 	om.mu.Lock()
 	defer om.mu.Unlock()
 	clear(om.elementByKey)
-	om.pairs.Init()
+	om.entries.Init()
 }
 
-func (om *Map[K, V]) Pairs() []Pair[K, V] {
+func (om *Map[K, V]) Entries() []Pair[K, V] {
 	om.mu.RLock()
 	defer om.mu.RUnlock()
 
-	return om.pairs0()
+	return om.entries0()
 }
 
-func (om *Map[K, V]) pairs0() []Pair[K, V] {
-	pairs := make([]Pair[K, V], 0, om.pairs.Len())
-	for e := om.pairs.Front(); e != nil; e = e.Next() {
+func (om *Map[K, V]) entries0() []Pair[K, V] {
+	pairs := make([]Pair[K, V], 0, om.entries.Len())
+	for e := om.entries.Front(); e != nil; e = e.Next() {
 		p := e.Value.(*Pair[K, V])
 		pairs = append(pairs, *p)
 	}
@@ -140,7 +140,7 @@ func (om *Map[K, V]) pairs0() []Pair[K, V] {
 }
 
 func (om *Map[K, V]) All() iter.Seq2[K, V] {
-	pairs := om.Pairs()
+	pairs := om.Entries()
 
 	return func(yield func(K, V) bool) {
 		for _, p := range pairs {
@@ -152,7 +152,7 @@ func (om *Map[K, V]) All() iter.Seq2[K, V] {
 }
 
 func (om *Map[K, V]) Keys() iter.Seq[K] {
-	pairs := om.Pairs()
+	pairs := om.Entries()
 
 	return func(yield func(K) bool) {
 		for _, p := range pairs {
@@ -164,7 +164,7 @@ func (om *Map[K, V]) Keys() iter.Seq[K] {
 }
 
 func (om *Map[K, V]) Values() iter.Seq[V] {
-	pairs := om.Pairs()
+	pairs := om.Entries()
 
 	return func(yield func(V) bool) {
 		for _, p := range pairs {
@@ -207,14 +207,14 @@ func SortFunc[K comparable, V any](om *Map[K, V], cmpFn func(a, b Pair[K, V]) in
 	om.mu.Lock()
 	defer om.mu.Unlock()
 
-	pairs := om.pairs0()
+	pairs := om.entries0()
 	slices.SortStableFunc(pairs, cmpFn)
-	om.pairs.Init()
+	om.entries.Init()
 	clear(om.elementByKey)
 
 	for i := range pairs {
 		p := &pairs[i]
-		e := om.pairs.PushBack(p)
+		e := om.entries.PushBack(p)
 		om.elementByKey[p.Key] = e
 	}
 }
@@ -232,7 +232,7 @@ func SortedByValue[K comparable, V cmp.Ordered](om *Map[K, V]) *Map[K, V] {
 }
 
 func SortedFunc[K comparable, V any](om *Map[K, V], cmpFn func(Pair[K, V], Pair[K, V]) int) *Map[K, V] {
-	pairs := om.Pairs()
+	pairs := om.Entries()
 	slices.SortStableFunc(pairs, cmpFn)
 	newOm := New[K, V]()
 
