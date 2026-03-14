@@ -32,7 +32,7 @@ func From[K comparable, V any](seq iter.Seq2[K, V]) *Map[K, V] {
 	om := New[K, V]()
 
 	for k, v := range seq {
-		om.Set(k, v)
+		om.set0(k, v)
 	}
 
 	return om
@@ -48,6 +48,11 @@ func (om *Map[K, V]) Len() int {
 func (om *Map[K, V]) Set(k K, v V) {
 	om.mu.Lock()
 	defer om.mu.Unlock()
+
+	om.set0(k, v)
+}
+
+func (om *Map[K, V]) set0(k K, v V) {
 	p := &Pair[K, V]{Key: k, Value: v}
 
 	if e, ok := om.elementByKey[k]; ok {
