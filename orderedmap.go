@@ -48,9 +48,6 @@ func (om *Map[K, V]) Len() int {
 }
 
 func (om *Map[K, V]) Clone() *Map[K, V] {
-	om.mu.RLock()
-	defer om.mu.RUnlock()
-
 	return From(om.All())
 }
 
