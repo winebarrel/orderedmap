@@ -277,6 +277,28 @@ func TestMarshalJSONValueError(t *testing.T) {
 	assert.Error(t, err)
 }
 
+func TestMarshalJSONBackslash(t *testing.T) {
+	om := orderedmap.New[string, any]()
+	om.Set(`foo\bar`, `baz\qux`)
+
+	b, err := json.Marshal(om)
+	assert.NoError(t, err)
+	assert.Equal(t, `{"foo\\bar":"baz\\qux"}`, string(b))
+}
+
+func TestMarshalJSONBackslashRoundTrip(t *testing.T) {
+	om := orderedmap.New[string, any]()
+	om.Set(`foo\bar`, `baz\qux`)
+
+	b, err := json.Marshal(om)
+	assert.NoError(t, err)
+
+	om2 := orderedmap.New[string, any]()
+	err = json.Unmarshal(b, om2)
+	assert.NoError(t, err)
+	assert.Equal(t, om.Entries(), om2.Entries())
+}
+
 func TestMarshalJSONRoundTrip(t *testing.T) {
 	om := orderedmap.New[string, any]()
 	om.Set("z", "last")

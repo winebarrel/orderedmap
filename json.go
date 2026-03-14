@@ -24,27 +24,24 @@ func (om *Map[K, V]) MarshalJSON() ([]byte, error) {
 
 		p := e.Value.(*Pair[K, V])
 
-		var keyStr string
+		var keyBytes []byte
 		if tm, ok := any(p.Key).(encoding.TextMarshaler); ok {
 			text, err := tm.MarshalText()
 			if err != nil {
 				return nil, fmt.Errorf("orderedmap: cannot marshal key: %w", err)
 			}
-			keyStr = string(text)
+			keyBytes, _ = json.Marshal(string(text))
 		} else {
-			keyJSON, err := json.Marshal(p.Key)
+			var err error
+			keyBytes, err = json.Marshal(p.Key)
 			if err != nil {
 				return nil, fmt.Errorf("orderedmap: cannot marshal key: %w", err)
 			}
-			// If the key marshaled as a JSON string, use it directly; otherwise wrap it.
-			if len(keyJSON) > 0 && keyJSON[0] == '"' {
-				keyStr = string(keyJSON[1 : len(keyJSON)-1])
-			} else {
-				keyStr = string(keyJSON)
+			// Non-string keys (e.g. int) must be wrapped as JSON strings for object keys.
+			if len(keyBytes) > 0 && keyBytes[0] != '"' {
+				keyBytes, _ = json.Marshal(string(keyBytes))
 			}
 		}
-
-		keyBytes, _ := json.Marshal(keyStr)
 		buf.Write(keyBytes)
 		buf.WriteByte(':')
 
