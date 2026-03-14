@@ -193,7 +193,7 @@ func Sorted[K cmp.Ordered, V any](om *Map[K, V]) *Map[K, V] {
 	})
 }
 
-func SortedFunc[K cmp.Ordered, V any](om *Map[K, V], cmp func(Pair[K, V], Pair[K, V]) int) *Map[K, V] {
+func SortedFunc[K comparable, V any](om *Map[K, V], cmp func(Pair[K, V], Pair[K, V]) int) *Map[K, V] {
 	pairs := om.Pairs()
 	slices.SortFunc(pairs, cmp)
 	newOm := New[K, V]()
