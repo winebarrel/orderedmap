@@ -45,6 +45,25 @@ func BenchmarkDelete(b *testing.B) {
 	}
 }
 
+func BenchmarkMarshalJSON(b *testing.B) {
+	for _, n := range []int{10, 100, 1000} {
+		b.Run(fmt.Sprintf("%d keys", n), func(b *testing.B) {
+			om := orderedmap.New[string, any]()
+			for i := 0; i < n; i++ {
+				om.Set(fmt.Sprintf("key%d", i), i)
+			}
+
+			b.ResetTimer()
+
+			for i := 0; i < b.N; i++ {
+				if _, err := json.Marshal(om); err != nil {
+					b.Fatal(err)
+				}
+			}
+		})
+	}
+}
+
 func BenchmarkUnmarshalJSON(b *testing.B) {
 	for _, n := range []int{10, 100, 1000} {
 		b.Run(fmt.Sprintf("%d keys", n), func(b *testing.B) {
