@@ -20,12 +20,12 @@ type Pair[K comparable, V any] struct {
 }
 
 func New[K comparable, V any]() *Map[K, V] {
-	m := &Map[K, V]{
+	om := &Map[K, V]{
 		pairs:        list.New(),
 		elementByKey: map[K]*list.Element{},
 	}
 
-	return m
+	return om
 }
 
 func (om *Map[K, V]) Len() int {
