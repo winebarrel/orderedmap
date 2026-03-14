@@ -2,6 +2,7 @@ package orderedmap
 
 import (
 	"bytes"
+	"container/list"
 	"encoding"
 	"encoding/json"
 	"fmt"
@@ -23,7 +24,8 @@ func (om *Map[K, V]) UnmarshalJSON(data []byte) error {
 	defer om.mu.Unlock()
 
 	if om.entries == nil {
-		*om = *New[K, V]()
+		om.entries = list.New()
+		om.elementByKey = map[K]*list.Element{}
 	} else {
 		clear(om.elementByKey)
 		om.entries.Init()
@@ -35,10 +37,7 @@ func (om *Map[K, V]) UnmarshalJSON(data []byte) error {
 			return err
 		}
 
-		keyStr, ok := kt.(string)
-		if !ok {
-			return fmt.Errorf("orderedmap: non-string JSON key: %v", kt)
-		}
+		keyStr := kt.(string) // JSON object keys are always strings
 
 		var k K
 		if tu, ok := any(&k).(encoding.TextUnmarshaler); ok {
