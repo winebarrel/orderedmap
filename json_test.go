@@ -286,6 +286,52 @@ func TestMarshalJSONBackslash(t *testing.T) {
 	assert.Equal(t, `{"foo\\bar":"baz\\qux"}`, string(b))
 }
 
+func TestMarshalJSONDoubleQuote(t *testing.T) {
+	om := orderedmap.New[string, any]()
+	om.Set(`foo"bar`, `baz"qux`)
+
+	b, err := json.Marshal(om)
+	assert.NoError(t, err)
+	assert.Equal(t, `{"foo\"bar":"baz\"qux"}`, string(b))
+}
+
+func TestMarshalJSONDoubleQuoteRoundTrip(t *testing.T) {
+	om := orderedmap.New[string, any]()
+	om.Set(`foo"bar`, `baz"qux`)
+
+	b, err := json.Marshal(om)
+	assert.NoError(t, err)
+
+	om2 := orderedmap.New[string, any]()
+	err = json.Unmarshal(b, om2)
+	assert.NoError(t, err)
+	assert.Equal(t, om.Entries(), om2.Entries())
+}
+
+func TestMarshalJSONControlChars(t *testing.T) {
+	om := orderedmap.New[string, any]()
+	om.Set("tab\there", "new\nline")
+	om.Set("cr\rkey", "null\x00byte")
+
+	b, err := json.Marshal(om)
+	assert.NoError(t, err)
+	assert.Equal(t, `{"tab\there":"new\nline","cr\rkey":"null\u0000byte"}`, string(b))
+}
+
+func TestMarshalJSONControlCharsRoundTrip(t *testing.T) {
+	om := orderedmap.New[string, any]()
+	om.Set("tab\there", "new\nline")
+	om.Set("cr\rkey", "null\x00byte")
+
+	b, err := json.Marshal(om)
+	assert.NoError(t, err)
+
+	om2 := orderedmap.New[string, any]()
+	err = json.Unmarshal(b, om2)
+	assert.NoError(t, err)
+	assert.Equal(t, om.Entries(), om2.Entries())
+}
+
 func TestMarshalJSONBackslashRoundTrip(t *testing.T) {
 	om := orderedmap.New[string, any]()
 	om.Set(`foo\bar`, `baz\qux`)
