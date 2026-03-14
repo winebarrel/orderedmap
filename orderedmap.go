@@ -206,8 +206,9 @@ func SortFunc[K comparable, V any](om *Map[K, V], cmpFn func(a, b Pair[K, V]) in
 	om.pairs.Init()
 	clear(om.elementByKey)
 
-	for _, p := range pairs {
-		e := om.pairs.PushBack(&p)
+	for i := range pairs {
+		p := &pairs[i]
+		e := om.pairs.PushBack(p)
 		om.elementByKey[p.Key] = e
 	}
 }
