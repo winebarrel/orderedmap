@@ -50,7 +50,7 @@ func BenchmarkUnmarshalJSON(b *testing.B) {
 		b.Run(fmt.Sprintf("%d keys", n), func(b *testing.B) {
 			// Build JSON input once
 			buf := []byte{'{'}
-			for i := range n {
+			for i := 0; i < n; i++ {
 				if i > 0 {
 					buf = append(buf, ',')
 				}
@@ -58,10 +58,12 @@ func BenchmarkUnmarshalJSON(b *testing.B) {
 			}
 			buf = append(buf, '}')
 
+			// Create the ordered map once and reuse it; UnmarshalJSON clears it each time.
+			om := orderedmap.New[string, any]()
+
 			b.ResetTimer()
 
-			for range b.N {
-				om := orderedmap.New[string, any]()
+			for i := 0; i < b.N; i++ {
 				if err := json.Unmarshal(buf, om); err != nil {
 					b.Fatal(err)
 				}
