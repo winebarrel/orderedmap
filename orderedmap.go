@@ -191,9 +191,15 @@ func (om *Map[K, V]) String() string {
 	return buf.String()
 }
 
-func Sort[K cmp.Ordered, V any](om *Map[K, V]) {
+func SortByKey[K cmp.Ordered, V any](om *Map[K, V]) {
 	SortFunc(om, func(a, b Pair[K, V]) int {
 		return cmp.Compare(a.Key, b.Key)
+	})
+}
+
+func SortByValue[K comparable, V cmp.Ordered](om *Map[K, V]) {
+	SortFunc(om, func(a, b Pair[K, V]) int {
+		return cmp.Compare(a.Value, b.Value)
 	})
 }
 
@@ -202,7 +208,7 @@ func SortFunc[K comparable, V any](om *Map[K, V], cmpFn func(a, b Pair[K, V]) in
 	defer om.mu.Unlock()
 
 	pairs := om.pairs0()
-	slices.SortFunc(pairs, cmpFn)
+	slices.SortStableFunc(pairs, cmpFn)
 	om.pairs.Init()
 	clear(om.elementByKey)
 
@@ -213,15 +219,21 @@ func SortFunc[K comparable, V any](om *Map[K, V], cmpFn func(a, b Pair[K, V]) in
 	}
 }
 
-func Sorted[K cmp.Ordered, V any](om *Map[K, V]) *Map[K, V] {
+func SortedByKey[K cmp.Ordered, V any](om *Map[K, V]) *Map[K, V] {
 	return SortedFunc(om, func(a, b Pair[K, V]) int {
 		return cmp.Compare(a.Key, b.Key)
 	})
 }
 
+func SortedByValue[K comparable, V cmp.Ordered](om *Map[K, V]) *Map[K, V] {
+	return SortedFunc(om, func(a, b Pair[K, V]) int {
+		return cmp.Compare(a.Value, b.Value)
+	})
+}
+
 func SortedFunc[K comparable, V any](om *Map[K, V], cmpFn func(Pair[K, V], Pair[K, V]) int) *Map[K, V] {
 	pairs := om.Pairs()
-	slices.SortFunc(pairs, cmpFn)
+	slices.SortStableFunc(pairs, cmpFn)
 	newOm := New[K, V]()
 
 	for _, p := range pairs {
