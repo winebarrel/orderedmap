@@ -143,6 +143,18 @@ func TestUnmarshalJSONUnmarshalKeyError(t *testing.T) {
 	assert.Error(t, err)
 }
 
+func TestUnmarshalJSONUnmarshalKeySuccess(t *testing.T) {
+	// K=int should accept numeric string keys from JSON, like encoding/json map keys.
+	om := orderedmap.New[int, any]()
+	err := json.Unmarshal([]byte(`{"1":1}`), om)
+	assert.NoError(t, err)
+
+	entries := om.Entries()
+	assert.Len(t, entries, 1)
+	assert.Equal(t, 1, entries[0].Key)
+	assert.Equal(t, float64(1), entries[0].Value)
+}
+
 func TestUnmarshalJSONDecodeValueError(t *testing.T) {
 	om := orderedmap.New[string, errValue]()
 	err := json.Unmarshal([]byte(`{"key":{}}`), om)
