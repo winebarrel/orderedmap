@@ -127,6 +127,10 @@ func (om *Map[K, V]) Pairs() []Pair[K, V] {
 	om.mu.RLock()
 	defer om.mu.RUnlock()
 
+	return om.pairs0()
+}
+
+func (om *Map[K, V]) pairs0() []Pair[K, V] {
 	pairs := make([]Pair[K, V], 0, om.pairs.Len())
 	for e := om.pairs.Front(); e != nil; e = e.Next() {
 		p := e.Value.(*Pair[K, V])
@@ -185,6 +189,28 @@ func (om *Map[K, V]) String() string {
 	buf.WriteString("]")
 
 	return buf.String()
+}
+
+func Sort[K cmp.Ordered, V any](om *Map[K, V]) {
+	SortFunc(om, func(a, b Pair[K, V]) int {
+		return cmp.Compare(a.Key, b.Key)
+	})
+}
+
+func SortFunc[K comparable, V any](om *Map[K, V], cmpFn func(a, b Pair[K, V]) int) {
+	om.mu.Lock()
+	defer om.mu.Unlock()
+
+	pairs := om.pairs0()
+	slices.SortFunc(pairs, cmpFn)
+	om.pairs.Init()
+	clear(om.elementByKey)
+
+	for i := range pairs {
+		p := &pairs[i]
+		e := om.pairs.PushBack(p)
+		om.elementByKey[p.Key] = e
+	}
 }
 
 func Sorted[K cmp.Ordered, V any](om *Map[K, V]) *Map[K, V] {
