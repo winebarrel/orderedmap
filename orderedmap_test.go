@@ -1,6 +1,7 @@
 package orderedmap_test
 
 import (
+	"cmp"
 	"math/rand/v2"
 	"slices"
 	"sync"
@@ -27,6 +28,15 @@ func mapToPairs[V any](t *testing.T, om *orderedmap.Map[string, V]) []pair[V] {
 		pairs = append(pairs, pair[V]{k: k, v: v})
 	}
 	return pairs
+}
+
+func pairsToMap[V any](t *testing.T, pairs []pair[V]) *orderedmap.Map[string, V] {
+	t.Helper()
+	om := orderedmap.New[string, V]()
+	for _, p := range pairs {
+		om.Set(p.k, p.v)
+	}
+	return om
 }
 
 func TestLen(t *testing.T) {
@@ -629,4 +639,20 @@ func TestFrom(t *testing.T) {
 	})
 
 	assert.Equal(t, []pair[int]{{k: "zoo", v: 0}, {k: "bar", v: 1}, {k: "foo", v: 2}}, mapToPairs(t, om))
+}
+
+func TestSorted(t *testing.T) {
+	pairs := []pair[int]{{k: "foo", v: 300}, {k: "bar", v: 200}, {k: "zoo", v: 100}}
+	om := pairsToMap(t, pairs)
+	sorted := orderedmap.Sorted(om)
+	assert.Equal(t, []pair[int]{{k: "bar", v: 200}, {k: "foo", v: 300}, {k: "zoo", v: 100}}, mapToPairs(t, sorted))
+}
+
+func TestSortedFunc(t *testing.T) {
+	pairs := []pair[int]{{k: "foo", v: 300}, {k: "bar", v: 200}, {k: "zoo", v: 100}}
+	om := pairsToMap(t, pairs)
+	sorted := orderedmap.SortedFunc(om, func(a, b orderedmap.Pair[string, int]) int {
+		return cmp.Compare(a.Value, b.Value)
+	})
+	assert.Equal(t, []pair[int]{{k: "zoo", v: 100}, {k: "bar", v: 200}, {k: "foo", v: 300}}, mapToPairs(t, sorted))
 }

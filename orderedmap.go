@@ -1,9 +1,11 @@
 package orderedmap
 
 import (
+	"cmp"
 	"container/list"
 	"fmt"
 	"iter"
+	"slices"
 	"strings"
 	"sync"
 )
@@ -183,4 +185,23 @@ func (om *Map[K, V]) String() string {
 	buf.WriteString("]")
 
 	return buf.String()
+}
+
+func Sorted[K cmp.Ordered, V any](om *Map[K, V]) *Map[K, V] {
+	return SortedFunc(om, func(a, b Pair[K, V]) int {
+		return cmp.Compare(a.Key, b.Key)
+	})
+}
+
+func SortedFunc[K cmp.Ordered, V any](om *Map[K, V], cmp func(Pair[K, V], Pair[K, V]) int) *Map[K, V] {
+	pairs := om.Pairs()
+	slices.SortFunc(pairs, cmp)
+
+	return From(func(yield func(K, V) bool) {
+		for _, p := range pairs {
+			if !yield(p.Key, p.Value) {
+				return
+			}
+		}
+	})
 }
