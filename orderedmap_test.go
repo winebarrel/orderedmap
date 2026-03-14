@@ -628,5 +628,5 @@ func TestFrom(t *testing.T) {
 		}
 	})
 
-	assert.Equal(t, mapToPairs(t, om), []pair[int]{{k: "zoo", v: 0}, {k: "bar", v: 1}, {k: "foo", v: 2}})
+	assert.Equal(t, []pair[int]{{k: "zoo", v: 0}, {k: "bar", v: 1}, {k: "foo", v: 2}}, mapToPairs(t, om))
 }
