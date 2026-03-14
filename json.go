@@ -47,7 +47,10 @@ func (om *Map[K, V]) UnmarshalJSON(data []byte) error {
 		} else {
 			keyJSON, _ := json.Marshal(keyStr)
 			if err := json.Unmarshal(keyJSON, &k); err != nil {
-				return fmt.Errorf("orderedmap: cannot unmarshal key %q into %T: %w", keyStr, k, err)
+				// Fallback: try unmarshaling the key as a raw JSON value (e.g. numeric keys).
+				if err2 := json.Unmarshal([]byte(keyStr), &k); err2 != nil {
+					return fmt.Errorf("orderedmap: cannot unmarshal key %q into %T: %w", keyStr, k, err)
+				}
 			}
 		}
 
