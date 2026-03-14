@@ -75,7 +75,7 @@ func main() {
 	//   foo new_bar
 
 	// Get all key-value pairs as a slice
-	pairs := om.Pairs()
+	pairs := om.Entries()
 	fmt.Println(pairs)
 	//=> [{zoo 100} {baz true} {foo new_bar}]
 
