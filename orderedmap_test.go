@@ -656,3 +656,12 @@ func TestSortedFunc(t *testing.T) {
 	})
 	assert.Equal(t, []pair[int]{{k: "zoo", v: 100}, {k: "bar", v: 200}, {k: "foo", v: 300}}, mapToPairs(t, sorted))
 }
+
+func TestSortedFuncWithBreak(t *testing.T) {
+	pairs := []pair[int]{{k: "foo", v: 300}, {k: "bar", v: 200}, {k: "zoo", v: 100}}
+	om := pairsToMap(t, pairs)
+	sorted := orderedmap.SortedFunc(om, func(a, b orderedmap.Pair[string, int]) int {
+		return cmp.Compare(a.Value, b.Value)
+	})
+	assert.Equal(t, []pair[int]{{k: "zoo", v: 100}, {k: "bar", v: 200}, {k: "foo", v: 300}}, mapToPairs(t, sorted))
+}
