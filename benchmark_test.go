@@ -1,6 +1,8 @@
 package orderedmap_test
 
 import (
+	"encoding/json"
+	"fmt"
 	"testing"
 
 	"github.com/winebarrel/orderedmap"
@@ -40,5 +42,30 @@ func BenchmarkDelete(b *testing.B) {
 
 	for i := 0; i < b.N; i++ {
 		om.Delete(i)
+	}
+}
+
+func BenchmarkUnmarshalJSON(b *testing.B) {
+	for _, n := range []int{10, 100, 1000} {
+		b.Run(fmt.Sprintf("%d keys", n), func(b *testing.B) {
+			// Build JSON input once
+			buf := []byte{'{'}
+			for i := range n {
+				if i > 0 {
+					buf = append(buf, ',')
+				}
+				buf = append(buf, []byte(fmt.Sprintf(`"key%d":%d`, i, i))...)
+			}
+			buf = append(buf, '}')
+
+			b.ResetTimer()
+
+			for range b.N {
+				om := orderedmap.New[string, any]()
+				if err := json.Unmarshal(buf, om); err != nil {
+					b.Fatal(err)
+				}
+			}
+		})
 	}
 }
