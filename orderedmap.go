@@ -39,6 +39,27 @@ func From[K comparable, V any](seq iter.Seq2[K, V]) *Map[K, V] {
 	return om
 }
 
+func Transform[K comparable, V any, R any](om *Map[K, V], f func(k K, v V) R) iter.Seq[R] {
+	pairs := om.Entries()
+
+	return func(yield func(R) bool) {
+		for _, p := range pairs {
+			r := f(p.Key, p.Value)
+			if !yield(r) {
+				return
+			}
+		}
+	}
+}
+
+func TransformSlice[K comparable, V any, R any](om *Map[K, V], f func(k K, v V) R) []R {
+	if s := slices.Collect(Transform(om, f)); s != nil {
+		return s
+	} else {
+		return []R{}
+	}
+}
+
 func (om *Map[K, V]) Len() int {
 	om.mu.RLock()
 	defer om.mu.RUnlock()
