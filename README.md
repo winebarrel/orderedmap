@@ -93,19 +93,6 @@ func main() {
 	om2 := orderedmap.From(slices.All([]string{"foo", "bar", "baz"}))
 	fmt.Println(om2)
 	//=> *orderedmap.Map[int,string][0:foo 1:bar 2:baz]
-
-	// Sort by key
-	om3 := orderedmap.New[string, int]()
-	om3.Set("banana", 2)
-	om3.Set("apple", 1)
-	om3.Set("cherry", 3)
-	orderedmap.SortByKey(om3)
-	for k, v := range om3.All() {
-		fmt.Println(k, v)
-	}
-	//=> apple 1
-	//   banana 2
-	//   cherry 3
 }
 ```
 
