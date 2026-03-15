@@ -96,6 +96,42 @@ func main() {
 }
 ```
 
+## Transform
+
+```go
+package main
+
+import (
+	"fmt"
+
+	"github.com/winebarrel/orderedmap"
+)
+
+func main() {
+	om := orderedmap.New[string, int]()
+	om.Set("foo", 1)
+	om.Set("bar", 2)
+	om.Set("baz", 3)
+
+	// Transform returns an iterator of transformed values
+	for s := range orderedmap.Transform(om, func(k string, v int) string {
+		return fmt.Sprintf("%s=%d", k, v)
+	}) {
+		fmt.Println(s)
+	}
+	//=> foo=1
+	//   bar=2
+	//   baz=3
+
+	// TransformSlice returns a slice of transformed values
+	ss := orderedmap.TransformSlice(om, func(k string, v int) string {
+		return fmt.Sprintf("%s=%d", k, v)
+	})
+	fmt.Println(ss)
+	//=> [foo=1 bar=2 baz=3]
+}
+```
+
 ## JSON Marshal / Unmarshal
 
 ```go
