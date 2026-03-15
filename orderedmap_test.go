@@ -3,6 +3,7 @@ package orderedmap_test
 import (
 	"math/rand/v2"
 	"slices"
+	"strconv"
 	"sync"
 	"testing"
 
@@ -593,6 +594,104 @@ func TestCollectValues(t *testing.T) {
 				om.Set(p.k, p.v)
 			}
 			assert.Equal(t, tt.expected, om.CollectValues())
+		})
+	}
+}
+
+func TestTransform(t *testing.T) {
+	tests := []struct {
+		name     string
+		init     []pair[int]
+		expected []string
+		f        func(string, int) string
+	}{
+		{
+			name:     "empty",
+			init:     []pair[int]{},
+			expected: nil,
+			f:        func(k string, v int) string { return k },
+		},
+		{
+			name:     "keys",
+			init:     []pair[int]{{k: "foo", v: 100}, {k: "bar", v: 200}, {k: "zoo", v: 300}},
+			expected: []string{"foofoo", "barbar", "zoozoo"},
+			f:        func(k string, v int) string { return k + k },
+		},
+		{
+			name:     "values",
+			init:     []pair[int]{{k: "foo", v: 100}, {k: "bar", v: 200}, {k: "zoo", v: 300}},
+			expected: []string{"101", "201", "301"},
+			f:        func(k string, v int) string { return strconv.Itoa(v + 1) },
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			om := orderedmap.New[string, int]()
+			for _, p := range tt.init {
+				om.Set(p.k, p.v)
+			}
+			seq := orderedmap.Transform(om, tt.f)
+			assert.Equal(t, tt.expected, slices.Collect(seq))
+		})
+	}
+}
+
+func TestTransformAbort(t *testing.T) {
+	om := orderedmap.New[string, int]()
+	om.Set("foo", 100)
+	om.Set("bar", 200)
+	om.Set("zoo", 300)
+
+	var calls int
+	seq := orderedmap.Transform(om, func(k string, v int) string {
+		calls++
+		return k
+	})
+
+	for range seq {
+		// Consume only the first element and then abort iteration.
+		break
+	}
+
+	assert.Equal(t, 1, calls, "transform function should only be called for the first element when iteration is aborted early")
+}
+
+func TestTransformSlice(t *testing.T) {
+	tests := []struct {
+		name     string
+		init     []pair[int]
+		expected []string
+		f        func(string, int) string
+	}{
+		{
+			name:     "empty",
+			init:     []pair[int]{},
+			expected: []string{},
+			f:        func(k string, v int) string { return k },
+		},
+		{
+			name:     "keys",
+			init:     []pair[int]{{k: "foo", v: 100}, {k: "bar", v: 200}, {k: "zoo", v: 300}},
+			expected: []string{"foofoo", "barbar", "zoozoo"},
+			f:        func(k string, v int) string { return k + k },
+		},
+		{
+			name:     "values",
+			init:     []pair[int]{{k: "foo", v: 100}, {k: "bar", v: 200}, {k: "zoo", v: 300}},
+			expected: []string{"101", "201", "301"},
+			f:        func(k string, v int) string { return strconv.Itoa(v + 1) },
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			om := orderedmap.New[string, int]()
+			for _, p := range tt.init {
+				om.Set(p.k, p.v)
+			}
+			s := orderedmap.TransformSlice(om, tt.f)
+			assert.Equal(t, tt.expected, s)
 		})
 	}
 }
