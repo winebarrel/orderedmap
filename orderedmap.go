@@ -4,6 +4,7 @@ import (
 	"container/list"
 	"fmt"
 	"iter"
+	"slices"
 	"strings"
 	"sync"
 )
@@ -165,6 +166,14 @@ func (om *Map[K, V]) Keys() iter.Seq[K] {
 	}
 }
 
+func (om *Map[K, V]) CollectKeys() []K {
+	if om.Len() == 0 {
+		return []K{}
+	} else {
+		return slices.Collect(om.Keys())
+	}
+}
+
 func (om *Map[K, V]) Values() iter.Seq[V] {
 	pairs := om.Entries()
 
@@ -174,6 +183,14 @@ func (om *Map[K, V]) Values() iter.Seq[V] {
 				return
 			}
 		}
+	}
+}
+
+func (om *Map[K, V]) CollectValues() []V {
+	if om.Len() == 0 {
+		return []V{}
+	} else {
+		return slices.Collect(om.Values())
 	}
 }
 

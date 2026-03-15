@@ -494,6 +494,35 @@ func TestKeys(t *testing.T) {
 	}
 }
 
+func TestCollectKeys(t *testing.T) {
+	tests := []struct {
+		name     string
+		init     []pair[any]
+		expected []string
+	}{
+		{
+			name:     "all keys",
+			init:     []pair[any]{{k: "foo", v: "bar"}, {k: "zoo", v: 100}, {k: "baz", v: true}},
+			expected: []string{"foo", "zoo", "baz"},
+		},
+		{
+			name:     "all keys (empty)",
+			init:     []pair[any]{},
+			expected: []string{},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			om := orderedmap.New[string, any]()
+			for _, p := range tt.init {
+				om.Set(p.k, p.v)
+			}
+			assert.Equal(t, tt.expected, om.CollectKeys())
+		})
+	}
+}
+
 func TestValues(t *testing.T) {
 	tests := []struct {
 		name     string
@@ -535,6 +564,35 @@ func TestValues(t *testing.T) {
 				}
 				assert.Equal(t, tt.expected, values)
 			}
+		})
+	}
+}
+
+func TestCollectValues(t *testing.T) {
+	tests := []struct {
+		name     string
+		init     []pair[any]
+		expected []any
+	}{
+		{
+			name:     "all values",
+			init:     []pair[any]{{k: "foo", v: "bar"}, {k: "zoo", v: 100}, {k: "baz", v: true}},
+			expected: []any{"bar", 100, true},
+		},
+		{
+			name:     "all values (empty)",
+			init:     []pair[any]{},
+			expected: []any{},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			om := orderedmap.New[string, any]()
+			for _, p := range tt.init {
+				om.Set(p.k, p.v)
+			}
+			assert.Equal(t, tt.expected, om.CollectValues())
 		})
 	}
 }
