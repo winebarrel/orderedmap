@@ -637,6 +637,26 @@ func TestTransform(t *testing.T) {
 	}
 }
 
+func TestTransformAbort(t *testing.T) {
+	om := orderedmap.New[string, int]()
+	om.Set("foo", 100)
+	om.Set("bar", 200)
+	om.Set("zoo", 300)
+
+	var calls int
+	seq := orderedmap.Transform(om, func(k string, v int) string {
+		calls++
+		return k
+	})
+
+	for range seq {
+		// Consume only the first element and then abort iteration.
+		break
+	}
+
+	assert.Equal(t, 1, calls, "transform function should only be called for the first element when iteration is aborted early")
+}
+
 func TestTransformSlice(t *testing.T) {
 	tests := []struct {
 		name     string
