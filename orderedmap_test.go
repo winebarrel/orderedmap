@@ -29,15 +29,6 @@ func mapToPairs[V any](t *testing.T, om *orderedmap.Map[string, V]) []pair[V] {
 	return pairs
 }
 
-func pairsToMap[V any](t *testing.T, pairs []pair[V]) *orderedmap.Map[string, V] {
-	t.Helper()
-	om := orderedmap.New[string, V]()
-	for _, p := range pairs {
-		om.Set(p.k, p.v)
-	}
-	return om
-}
-
 func TestLen(t *testing.T) {
 	tests := []struct {
 		name     string
