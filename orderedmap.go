@@ -167,10 +167,10 @@ func (om *Map[K, V]) Keys() iter.Seq[K] {
 }
 
 func (om *Map[K, V]) CollectKeys() []K {
-	if om.Len() == 0 {
-		return []K{}
+	if s := slices.Collect(om.Keys()); s != nil {
+		return s
 	} else {
-		return slices.Collect(om.Keys())
+		return []K{}
 	}
 }
 
@@ -187,10 +187,10 @@ func (om *Map[K, V]) Values() iter.Seq[V] {
 }
 
 func (om *Map[K, V]) CollectValues() []V {
-	if om.Len() == 0 {
-		return []V{}
+	if s := slices.Collect(om.Values()); s != nil {
+		return s
 	} else {
-		return slices.Collect(om.Values())
+		return []V{}
 	}
 }
 
