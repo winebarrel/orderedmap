@@ -69,6 +69,43 @@ func TestLen(t *testing.T) {
 	}
 }
 
+func TestClone(t *testing.T) {
+	tests := []struct {
+		name string
+		init []pair[any]
+	}{
+		{
+			name: "empty",
+			init: []pair[any]{},
+		},
+		{
+			name: "1 item",
+			init: []pair[any]{{k: "foo", v: "bar"}},
+		},
+		{
+			name: "2 items",
+			init: []pair[any]{{k: "foo", v: "bar"}, {k: "zoo", v: 100}},
+		},
+		{
+			name: "3 items",
+			init: []pair[any]{{k: "foo", v: "bar"}, {k: "zoo", v: 100}, {k: "baz", v: true}},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			om := orderedmap.New[string, any]()
+			for _, p := range tt.init {
+				om.Set(p.k, p.v)
+			}
+			om2 := om.Clone()
+			assert.NotSame(t, om, om2)
+			om.Clear()
+			assert.Equal(t, tt.init, mapToPairs(t, om2))
+		})
+	}
+}
+
 func TestSet(t *testing.T) {
 	tests := []struct {
 		name     string
