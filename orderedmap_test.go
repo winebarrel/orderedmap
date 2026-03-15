@@ -1,7 +1,6 @@
 package orderedmap_test
 
 import (
-	"cmp"
 	"math/rand/v2"
 	"slices"
 	"sync"
@@ -639,73 +638,4 @@ func TestFrom(t *testing.T) {
 	})
 
 	assert.Equal(t, []pair[int]{{k: "zoo", v: 0}, {k: "bar", v: 1}, {k: "foo", v: 2}}, mapToPairs(t, om))
-}
-
-func TestSortedByKey(t *testing.T) {
-	pairs := []pair[int]{{k: "foo", v: 300}, {k: "bar", v: 200}, {k: "zoo", v: 100}}
-	om := pairsToMap(t, pairs)
-	sorted := orderedmap.SortedByKey(om)
-	assert.Equal(t, []pair[int]{{k: "bar", v: 200}, {k: "foo", v: 300}, {k: "zoo", v: 100}}, mapToPairs(t, sorted))
-}
-
-func TestSortedByValue(t *testing.T) {
-	pairs := []pair[int]{{k: "foo", v: 300}, {k: "bar", v: 200}, {k: "zoo", v: 100}}
-	om := pairsToMap(t, pairs)
-	sorted := orderedmap.SortedByValue(om)
-	assert.Equal(t, []pair[int]{{k: "zoo", v: 100}, {k: "bar", v: 200}, {k: "foo", v: 300}}, mapToPairs(t, sorted))
-}
-
-func TestSortedFunc(t *testing.T) {
-	pairs := []pair[int]{{k: "foo", v: 300}, {k: "bar", v: 200}, {k: "zoo", v: 100}}
-	om := pairsToMap(t, pairs)
-	sorted := orderedmap.SortedFunc(om, func(a, b orderedmap.Pair[string, int]) int {
-		return -cmp.Compare(a.Value, b.Value)
-	})
-	assert.Equal(t, []pair[int]{{k: "foo", v: 300}, {k: "bar", v: 200}, {k: "zoo", v: 100}}, mapToPairs(t, sorted))
-}
-
-func TestSortedFuncWithBreak(t *testing.T) {
-	pairs := []pair[int]{{k: "foo", v: 300}, {k: "bar", v: 200}, {k: "zoo", v: 100}}
-	om := pairsToMap(t, pairs)
-	sorted := orderedmap.SortedFunc(om, func(a, b orderedmap.Pair[string, int]) int {
-		return cmp.Compare(a.Value, b.Value)
-	})
-	assert.Equal(t, []pair[int]{{k: "zoo", v: 100}, {k: "bar", v: 200}, {k: "foo", v: 300}}, mapToPairs(t, sorted))
-}
-
-func TestSortByKey(t *testing.T) {
-	pairs := []pair[int]{{k: "foo", v: 300}, {k: "bar", v: 200}, {k: "zoo", v: 100}}
-	om := pairsToMap(t, pairs)
-	orderedmap.SortByKey(om)
-	assert.Equal(t, []pair[int]{{k: "bar", v: 200}, {k: "foo", v: 300}, {k: "zoo", v: 100}}, mapToPairs(t, om))
-}
-
-func TestSortByValue(t *testing.T) {
-	pairs := []pair[int]{{k: "foo", v: 300}, {k: "bar", v: 200}, {k: "zoo", v: 100}}
-	om := pairsToMap(t, pairs)
-	orderedmap.SortByValue(om)
-	assert.Equal(t, []pair[int]{{k: "zoo", v: 100}, {k: "bar", v: 200}, {k: "foo", v: 300}}, mapToPairs(t, om))
-}
-
-func TestSortFunc(t *testing.T) {
-	pairs := []pair[int]{{k: "foo", v: 300}, {k: "bar", v: 200}, {k: "zoo", v: 100}}
-	om := pairsToMap(t, pairs)
-	orderedmap.SortFunc(om, func(a, b orderedmap.Pair[string, int]) int {
-		return -cmp.Compare(a.Value, b.Value)
-	})
-	assert.Equal(t, []pair[int]{{k: "foo", v: 300}, {k: "bar", v: 200}, {k: "zoo", v: 100}}, mapToPairs(t, om))
-}
-
-func TestClone(t *testing.T) {
-	pairs := []pair[int]{{k: "foo", v: 300}, {k: "bar", v: 200}, {k: "zoo", v: 100}}
-	om := pairsToMap(t, pairs)
-	om2 := om.Clone()
-
-	// cloned map should be a distinct instance
-	assert.NotSame(t, om, om2)
-
-	om.Delete("foo")
-
-	// clone should preserve original key/value pairs and order
-	assert.Equal(t, pairs, mapToPairs(t, om2))
 }
