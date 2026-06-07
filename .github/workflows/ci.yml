@@ -21,7 +21,7 @@ jobs:
           cache: false
       - uses: golangci/golangci-lint-action@v9
       - run: make TEST_OPTS='-race -coverprofile=coverage.txt'
-      - uses: codecov/codecov-action@v6
+      - uses: codecov/codecov-action@v7
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
   bench:
