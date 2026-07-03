@@ -4,7 +4,6 @@
 [![Go Reference](https://pkg.go.dev/badge/github.com/winebarrel/orderedmap.svg)](https://pkg.go.dev/github.com/winebarrel/orderedmap)
 [![CI](https://github.com/winebarrel/orderedmap/actions/workflows/ci.yml/badge.svg)](https://github.com/winebarrel/orderedmap/actions/workflows/ci.yml)
 [![codecov](https://codecov.io/gh/winebarrel/orderedmap/graph/badge.svg)](https://codecov.io/gh/winebarrel/orderedmap)
-[![Go Report Card](https://goreportcard.com/badge/github.com/winebarrel/orderedmap)](https://goreportcard.com/report/github.com/winebarrel/orderedmap)
 
 A generic, thread-safe ordered map for Go that preserves insertion order using [container/list](https://pkg.go.dev/container/list).
 
