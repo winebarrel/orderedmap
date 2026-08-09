@@ -2,10 +2,11 @@ package orderedmap
 
 import (
 	"bytes"
-	"container/list"
 	"encoding"
 	"encoding/json"
 	"fmt"
+
+	"github.com/winebarrel/linkedlist"
 )
 
 func (om *Map[K, V]) MarshalJSON() ([]byte, error) {
@@ -22,7 +23,7 @@ func (om *Map[K, V]) MarshalJSON() ([]byte, error) {
 		}
 		first = false
 
-		p := e.Value.(*Pair[K, V])
+		p := e.Value
 
 		var keyBytes []byte
 		if tm, ok := any(p.Key).(encoding.TextMarshaler); ok {
@@ -72,8 +73,8 @@ func (om *Map[K, V]) UnmarshalJSON(data []byte) error {
 	defer om.mu.Unlock()
 
 	if om.entries == nil {
-		om.entries = list.New()
-		om.elementByKey = map[K]*list.Element{}
+		om.entries = linkedlist.New[*Pair[K, V]]()
+		om.elementByKey = map[K]*linkedlist.Element[*Pair[K, V]]{}
 	} else {
 		clear(om.elementByKey)
 		om.entries.Init()
