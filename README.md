@@ -10,7 +10,7 @@ A generic, thread-safe ordered map for Go that preserves insertion order using [
 ## Installation
 
 ```
-go get github.com/winebarrel/orderedmap
+go get github.com/winebarrel/orderedmap/v2
 ```
 
 Requires Go 1.25+.
@@ -24,7 +24,7 @@ import (
 	"fmt"
 	"slices"
 
-	"github.com/winebarrel/orderedmap"
+	"github.com/winebarrel/orderedmap/v2"
 )
 
 func main() {
@@ -103,7 +103,7 @@ package main
 import (
 	"fmt"
 
-	"github.com/winebarrel/orderedmap"
+	"github.com/winebarrel/orderedmap/v2"
 )
 
 func main() {
@@ -140,7 +140,7 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/winebarrel/orderedmap"
+	"github.com/winebarrel/orderedmap/v2"
 )
 
 func main() {
