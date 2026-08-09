@@ -13,7 +13,7 @@ A generic, thread-safe ordered map for Go that preserves insertion order using [
 go get github.com/winebarrel/orderedmap
 ```
 
-Requires Go 1.23+.
+Requires Go 1.25+.
 
 ## Usage
 
