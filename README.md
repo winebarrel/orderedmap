@@ -5,7 +5,7 @@
 [![CI](https://github.com/winebarrel/orderedmap/actions/workflows/ci.yml/badge.svg)](https://github.com/winebarrel/orderedmap/actions/workflows/ci.yml)
 [![codecov](https://codecov.io/gh/winebarrel/orderedmap/graph/badge.svg)](https://codecov.io/gh/winebarrel/orderedmap)
 
-A generic, thread-safe ordered map for Go that preserves insertion order using [container/list](https://pkg.go.dev/container/list).
+A generic, thread-safe ordered map for Go that preserves insertion order using [linkedlist](https://github.com/winebarrel/linkedlist).
 
 ## Installation
 
@@ -13,7 +13,7 @@ A generic, thread-safe ordered map for Go that preserves insertion order using [
 go get github.com/winebarrel/orderedmap
 ```
 
-Requires Go 1.23+.
+Requires Go 1.25+.
 
 ## Usage
 
