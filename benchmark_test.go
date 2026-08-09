@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/winebarrel/orderedmap"
+	"github.com/winebarrel/orderedmap/v2"
 )
 
 func BenchmarkSet(b *testing.B) {

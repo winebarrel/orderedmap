@@ -1,18 +1,19 @@
 package orderedmap
 
 import (
-	"container/list"
 	"fmt"
 	"iter"
 	"slices"
 	"strings"
 	"sync"
+
+	"github.com/winebarrel/linkedlist"
 )
 
 type Map[K comparable, V any] struct {
 	mu           sync.RWMutex
-	entries      *list.List
-	elementByKey map[K]*list.Element
+	entries      *linkedlist.List[*Pair[K, V]]
+	elementByKey map[K]*linkedlist.Element[*Pair[K, V]]
 }
 
 type Pair[K comparable, V any] struct {
@@ -22,8 +23,8 @@ type Pair[K comparable, V any] struct {
 
 func New[K comparable, V any]() *Map[K, V] {
 	om := &Map[K, V]{
-		entries:      list.New(),
-		elementByKey: map[K]*list.Element{},
+		entries:      linkedlist.New[*Pair[K, V]](),
+		elementByKey: map[K]*linkedlist.Element[*Pair[K, V]]{},
 	}
 
 	return om
@@ -112,7 +113,7 @@ func (om *Map[K, V]) GetOk(k K) (V, bool) {
 	defer om.mu.RUnlock()
 
 	if e, ok := om.elementByKey[k]; ok {
-		p := e.Value.(*Pair[K, V])
+		p := e.Value
 		return p.Value, true
 	} else {
 		var v V
@@ -132,7 +133,7 @@ func (om *Map[K, V]) DeleteOk(k K) (V, bool) {
 	if e, ok := om.elementByKey[k]; ok {
 		delete(om.elementByKey, k)
 		om.entries.Remove(e)
-		p := e.Value.(*Pair[K, V])
+		p := e.Value
 		return p.Value, true
 	} else {
 		var v V
@@ -157,7 +158,7 @@ func (om *Map[K, V]) Entries() []Pair[K, V] {
 func (om *Map[K, V]) entries0() []Pair[K, V] {
 	pairs := make([]Pair[K, V], 0, om.entries.Len())
 	for e := om.entries.Front(); e != nil; e = e.Next() {
-		p := e.Value.(*Pair[K, V])
+		p := e.Value
 		pairs = append(pairs, *p)
 	}
 	return pairs
