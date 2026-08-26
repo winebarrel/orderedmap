@@ -10,9 +10,8 @@ import (
 
 func BenchmarkSet(b *testing.B) {
 	om := orderedmap.New[int, struct{}]()
-	b.ResetTimer()
 
-	for i := 0; i < b.N; i++ {
+	for i := 0; b.Loop(); i++ {
 		om.Set(i, struct{}{})
 	}
 }
@@ -73,7 +72,7 @@ func BenchmarkUnmarshalJSON(b *testing.B) {
 				if i > 0 {
 					buf = append(buf, ',')
 				}
-				buf = append(buf, []byte(fmt.Sprintf(`"key%d":%d`, i, i))...)
+				buf = append(buf, fmt.Appendf(nil, `"key%d":%d`, i, i)...)
 			}
 			buf = append(buf, '}')
 
