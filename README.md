@@ -113,7 +113,7 @@ func main() {
 	om.Set("baz", 3)
 
 	// Transform returns an iterator of transformed values
-	for s := range orderedmap.Transform(om, func(k string, v int) string {
+	for s := range om.Transform(func(k string, v int) string {
 		return fmt.Sprintf("%s=%d", k, v)
 	}) {
 		fmt.Println(s)
@@ -123,7 +123,7 @@ func main() {
 	//   baz=3
 
 	// TransformSlice returns a slice of transformed values
-	ss := orderedmap.TransformSlice(om, func(k string, v int) string {
+	ss := om.TransformSlice(func(k string, v int) string {
 		return fmt.Sprintf("%s=%d", k, v)
 	})
 	fmt.Println(ss)
