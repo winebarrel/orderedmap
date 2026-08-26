@@ -670,6 +670,8 @@ func TestTransform(t *testing.T) {
 			}
 			seq := orderedmap.Transform(om, tt.f)
 			assert.Equal(t, tt.expected, slices.Collect(seq))
+			seq = om.Transform(tt.f)
+			assert.Equal(t, tt.expected, slices.Collect(seq))
 		})
 	}
 }
@@ -728,6 +730,8 @@ func TestTransformSlice(t *testing.T) {
 				om.Set(p.k, p.v)
 			}
 			s := orderedmap.TransformSlice(om, tt.f)
+			assert.Equal(t, tt.expected, s)
+			s = om.TransformSlice(tt.f)
 			assert.Equal(t, tt.expected, s)
 		})
 	}

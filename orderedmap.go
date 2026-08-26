@@ -53,12 +53,20 @@ func Transform[K comparable, V any, R any](om *Map[K, V], f func(k K, v V) R) it
 	}
 }
 
+func (om *Map[K, V]) Transform[R any](f func(k K, v V) R) iter.Seq[R] {
+	return Transform(om, f)
+}
+
 func TransformSlice[K comparable, V any, R any](om *Map[K, V], f func(k K, v V) R) []R {
 	if s := slices.Collect(Transform(om, f)); s != nil {
 		return s
 	} else {
 		return []R{}
 	}
+}
+
+func (om *Map[K, V]) TransformSlice[R any](f func(k K, v V) R) []R {
+	return TransformSlice(om, f)
 }
 
 func (om *Map[K, V]) Len() int {
