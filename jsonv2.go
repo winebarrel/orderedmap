@@ -3,6 +3,7 @@ package orderedmap
 import (
 	"encoding/json/jsontext"
 	jsonv2 "encoding/json/v2"
+	"reflect"
 
 	"github.com/winebarrel/linkedlist"
 )
@@ -41,7 +42,9 @@ func (om *Map[K, V]) MarshalJSONTo(enc *jsontext.Encoder) error {
 // Entries already held by the map are discarded.
 func (om *Map[K, V]) UnmarshalJSONFrom(dec *jsontext.Decoder) error {
 	if k := dec.PeekKind(); k != '{' {
-		return &jsonv2.SemanticError{JSONKind: k}
+		// GoType must be set: the encoding/json v1 wrapper turns this into an
+		// UnmarshalTypeError whose Error() dereferences it.
+		return &jsonv2.SemanticError{JSONKind: k, GoType: reflect.TypeFor[Map[K, V]]()}
 	}
 
 	if _, err := dec.ReadToken(); err != nil {

@@ -347,3 +347,12 @@ func TestUnmarshalJSONFromObjectNamePosition(t *testing.T) {
 	om := orderedmap.New[string, any]()
 	assert.Error(t, om.UnmarshalJSONFrom(dec))
 }
+
+func TestUnmarshalJSONFromNonObjectErrorMessage(t *testing.T) {
+	for _, input := range []string{`null`, `[1,2]`, `"x"`, `1`} {
+		t.Run(input, func(t *testing.T) {
+			err := jsonv2.Unmarshal([]byte(input), orderedmap.New[string, int]())
+			assert.ErrorContains(t, err, "orderedmap.Map[string,int]")
+		})
+	}
+}
