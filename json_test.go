@@ -359,3 +359,22 @@ func TestMarshalJSONRoundTrip(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, om.Entries(), om2.Entries())
 }
+
+func TestMarshalJSONMethod(t *testing.T) {
+	om := orderedmap.New[string, any]()
+	om.Set("z", "<b>")
+	om.Set("a", 1)
+
+	// Called directly, MarshalJSON keeps encoding/json v1 semantics (HTML escaping).
+	b, err := om.MarshalJSON()
+	assert.NoError(t, err)
+	assert.Equal(t, `{"z":"\u003cb\u003e","a":1}`, string(b))
+}
+
+func TestUnmarshalJSONMethod(t *testing.T) {
+	om := orderedmap.New[string, any]()
+	// Duplicate names are allowed under encoding/json v1 semantics.
+	err := om.UnmarshalJSON([]byte(`{"a":1,"a":2}`))
+	assert.NoError(t, err)
+	assert.Equal(t, []pair[any]{{k: "a", v: float64(2)}}, mapToPairs(t, om))
+}

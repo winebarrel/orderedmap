@@ -13,7 +13,7 @@ A generic, thread-safe ordered map for Go that preserves insertion order using [
 go get github.com/winebarrel/orderedmap/v2
 ```
 
-Requires Go 1.25+.
+Requires Go 1.27+.
 
 ## Usage
 
@@ -153,6 +153,51 @@ func main() {
 	b, _ := json.Marshal(om)
 	fmt.Println(string(b))
 	//=> {"z":3,"a":1,"m":2}
+
+	// Unmarshal: preserves key order from JSON
+	om2 := orderedmap.New[string, any]()
+	json.Unmarshal([]byte(`{"z":3,"a":1,"m":2}`), om2)
+
+	for k, v := range om2.All() {
+		fmt.Println(k, v)
+	}
+	//=> z 3
+	//   a 1
+	//   m 2
+}
+```
+
+## encoding/json/v2
+
+`Map` implements [`MarshalerTo`](https://pkg.go.dev/encoding/json/v2#MarshalerTo) and
+[`UnmarshalerFrom`](https://pkg.go.dev/encoding/json/v2#UnmarshalerFrom), so `encoding/json/v2`
+options (indentation, HTML escaping, ...) are honored.
+
+```go
+package main
+
+import (
+	"encoding/json/jsontext"
+	json "encoding/json/v2"
+	"fmt"
+
+	"github.com/winebarrel/orderedmap/v2"
+)
+
+func main() {
+	// Marshal: preserves insertion order
+	om := orderedmap.New[string, any]()
+	om.Set("z", 3)
+	om.Set("a", 1)
+	om.Set("m", 2)
+
+	b, _ := json.Marshal(om, jsontext.WithIndent("  "))
+	fmt.Println(string(b))
+	//=> {
+	//     "z": 3,
+	//     "a": 1,
+	//     "m": 2
+	//   }
 
 	// Unmarshal: preserves key order from JSON
 	om2 := orderedmap.New[string, any]()

@@ -2,6 +2,7 @@ package orderedmap_test
 
 import (
 	"encoding/json"
+	jsonv2 "encoding/json/v2"
 	"fmt"
 	"testing"
 
@@ -83,6 +84,52 @@ func BenchmarkUnmarshalJSON(b *testing.B) {
 
 			for i := 0; i < b.N; i++ {
 				if err := json.Unmarshal(buf, om); err != nil {
+					b.Fatal(err)
+				}
+			}
+		})
+	}
+}
+
+func BenchmarkMarshalJSONTo(b *testing.B) {
+	for _, n := range []int{10, 100, 1000} {
+		b.Run(fmt.Sprintf("%d keys", n), func(b *testing.B) {
+			om := orderedmap.New[string, any]()
+			for i := 0; i < n; i++ {
+				om.Set(fmt.Sprintf("key%d", i), i)
+			}
+
+			b.ResetTimer()
+
+			for i := 0; i < b.N; i++ {
+				if _, err := jsonv2.Marshal(om); err != nil {
+					b.Fatal(err)
+				}
+			}
+		})
+	}
+}
+
+func BenchmarkUnmarshalJSONFrom(b *testing.B) {
+	for _, n := range []int{10, 100, 1000} {
+		b.Run(fmt.Sprintf("%d keys", n), func(b *testing.B) {
+			// Build JSON input once
+			buf := []byte{'{'}
+			for i := 0; i < n; i++ {
+				if i > 0 {
+					buf = append(buf, ',')
+				}
+				buf = append(buf, fmt.Appendf(nil, `"key%d":%d`, i, i)...)
+			}
+			buf = append(buf, '}')
+
+			// Create the ordered map once and reuse it; UnmarshalJSONFrom clears it each time.
+			om := orderedmap.New[string, any]()
+
+			b.ResetTimer()
+
+			for i := 0; i < b.N; i++ {
+				if err := jsonv2.Unmarshal(buf, om); err != nil {
 					b.Fatal(err)
 				}
 			}

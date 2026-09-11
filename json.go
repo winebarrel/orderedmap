@@ -1,116 +1,18 @@
 package orderedmap
 
 import (
-	"bytes"
-	"encoding"
-	"encoding/json"
-	"fmt"
-
-	"github.com/winebarrel/linkedlist"
+	jsonv1 "encoding/json"
+	jsonv2 "encoding/json/v2"
 )
 
+// MarshalJSON implements [jsonv1.Marshaler] with encoding/json v1 semantics.
+// Encoders aware of [jsonv2.MarshalerTo] call [Map.MarshalJSONTo] instead.
 func (om *Map[K, V]) MarshalJSON() ([]byte, error) {
-	om.mu.RLock()
-	defer om.mu.RUnlock()
-
-	var buf bytes.Buffer
-	buf.WriteByte('{')
-
-	first := true
-	for e := om.entries.Front(); e != nil; e = e.Next() {
-		if !first {
-			buf.WriteByte(',')
-		}
-		first = false
-
-		p := e.Value
-
-		var keyBytes []byte
-		if tm, ok := any(p.Key).(encoding.TextMarshaler); ok {
-			text, err := tm.MarshalText()
-			if err != nil {
-				return nil, fmt.Errorf("orderedmap: cannot marshal key: %w", err)
-			}
-			keyBytes, _ = json.Marshal(string(text))
-		} else {
-			var err error
-			keyBytes, err = json.Marshal(p.Key)
-			if err != nil {
-				return nil, fmt.Errorf("orderedmap: cannot marshal key: %w", err)
-			}
-			// Non-string keys (e.g. int) must be wrapped as JSON strings for object keys.
-			if len(keyBytes) > 0 && keyBytes[0] != '"' {
-				keyBytes, _ = json.Marshal(string(keyBytes))
-			}
-		}
-		buf.Write(keyBytes)
-		buf.WriteByte(':')
-
-		valBytes, err := json.Marshal(p.Value)
-		if err != nil {
-			return nil, fmt.Errorf("orderedmap: cannot marshal value: %w", err)
-		}
-		buf.Write(valBytes)
-	}
-
-	buf.WriteByte('}')
-	return buf.Bytes(), nil
+	return jsonv2.Marshal(om, jsonv1.DefaultOptionsV1())
 }
 
+// UnmarshalJSON implements [jsonv1.Unmarshaler] with encoding/json v1 semantics.
+// Decoders aware of [jsonv2.UnmarshalerFrom] call [Map.UnmarshalJSONFrom] instead.
 func (om *Map[K, V]) UnmarshalJSON(data []byte) error {
-	dec := json.NewDecoder(bytes.NewReader(data))
-
-	t, err := dec.Token()
-	if err != nil {
-		return err
-	}
-
-	if delim, ok := t.(json.Delim); !ok || delim != '{' {
-		return fmt.Errorf("orderedmap: expected JSON object, got %v", t)
-	}
-
-	om.mu.Lock()
-	defer om.mu.Unlock()
-
-	if om.entries == nil {
-		om.entries = linkedlist.New[*Pair[K, V]]()
-		om.elementByKey = map[K]*linkedlist.Element[*Pair[K, V]]{}
-	} else {
-		clear(om.elementByKey)
-		om.entries.Init()
-	}
-
-	for dec.More() {
-		kt, err := dec.Token()
-		if err != nil {
-			return err
-		}
-
-		keyStr := kt.(string) // JSON object keys are always strings
-
-		var k K
-		if tu, ok := any(&k).(encoding.TextUnmarshaler); ok {
-			if err := tu.UnmarshalText([]byte(keyStr)); err != nil {
-				return fmt.Errorf("orderedmap: cannot unmarshal key %q: %w", keyStr, err)
-			}
-		} else {
-			keyJSON, _ := json.Marshal(keyStr)
-			if err := json.Unmarshal(keyJSON, &k); err != nil {
-				// Fallback: try unmarshaling the key as a raw JSON value (e.g. numeric keys).
-				if err2 := json.Unmarshal([]byte(keyStr), &k); err2 != nil {
-					return fmt.Errorf("orderedmap: cannot unmarshal key %q into %T: %w", keyStr, k, err)
-				}
-			}
-		}
-
-		var v V
-		if err := dec.Decode(&v); err != nil {
-			return err
-		}
-
-		om.set0(k, v)
-	}
-
-	_, err = dec.Token() // closing }
-	return err
+	return jsonv2.Unmarshal(data, om, jsonv1.DefaultOptionsV1())
 }
