@@ -95,6 +95,32 @@ func main() {
 }
 ```
 
+## Filter
+
+```go
+package main
+
+import (
+	"fmt"
+
+	"github.com/winebarrel/orderedmap/v2"
+)
+
+func main() {
+	om := orderedmap.New[string, int]()
+	om.Set("foo", 1)
+	om.Set("bar", 2)
+	om.Set("baz", 3)
+
+	// Filter returns a new map containing only the entries that satisfy the predicate
+	om2 := om.Filter(func(k string, v int) bool {
+		return v != 2
+	})
+	fmt.Println(om2)
+	//=> *orderedmap.Map[string,int][foo:1 baz:3]
+}
+```
+
 ## Transform
 
 ```go

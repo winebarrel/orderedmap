@@ -106,6 +106,61 @@ func TestClone(t *testing.T) {
 	}
 }
 
+func TestFilter(t *testing.T) {
+	tests := []struct {
+		name     string
+		init     []pair[int]
+		expected []pair[int]
+		f        func(string, int) bool
+	}{
+		{
+			name:     "empty",
+			init:     []pair[int]{},
+			expected: []pair[int]{},
+			f:        func(k string, v int) bool { return true },
+		},
+		{
+			name:     "all",
+			init:     []pair[int]{{k: "foo", v: 100}, {k: "bar", v: 200}, {k: "zoo", v: 300}},
+			expected: []pair[int]{{k: "foo", v: 100}, {k: "bar", v: 200}, {k: "zoo", v: 300}},
+			f:        func(k string, v int) bool { return true },
+		},
+		{
+			name:     "none",
+			init:     []pair[int]{{k: "foo", v: 100}, {k: "bar", v: 200}, {k: "zoo", v: 300}},
+			expected: []pair[int]{},
+			f:        func(k string, v int) bool { return false },
+		},
+		{
+			name:     "by key",
+			init:     []pair[int]{{k: "foo", v: 100}, {k: "bar", v: 200}, {k: "zoo", v: 300}},
+			expected: []pair[int]{{k: "foo", v: 100}, {k: "zoo", v: 300}},
+			f:        func(k string, v int) bool { return k != "bar" },
+		},
+		{
+			name:     "by value",
+			init:     []pair[int]{{k: "foo", v: 100}, {k: "bar", v: 200}, {k: "zoo", v: 300}},
+			expected: []pair[int]{{k: "bar", v: 200}, {k: "zoo", v: 300}},
+			f:        func(k string, v int) bool { return v >= 200 },
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			om := orderedmap.New[string, int]()
+			for _, p := range tt.init {
+				om.Set(p.k, p.v)
+			}
+			om2 := om.Filter(tt.f)
+			assert.NotSame(t, om, om2)
+			assert.Equal(t, tt.expected, mapToPairs(t, om2))
+			assert.Equal(t, tt.init, mapToPairs(t, om))
+			om.Clear()
+			assert.Equal(t, tt.expected, mapToPairs(t, om2))
+		})
+	}
+}
+
 func TestSet(t *testing.T) {
 	tests := []struct {
 		name     string
