@@ -70,6 +70,10 @@ func (om *Map[K, V]) TransformSlice[R any](f func(k K, v V) R) []R {
 }
 
 func (om *Map[K, V]) Len() int {
+	if om == nil {
+		return 0
+	}
+
 	om.mu.RLock()
 	defer om.mu.RUnlock()
 

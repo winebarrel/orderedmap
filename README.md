@@ -85,6 +85,11 @@ func main() {
 	fmt.Println(om.Len())
 	//=> 2
 
+	// Len returns 0 for a nil map
+	var nilMap *orderedmap.Map[string, any]
+	fmt.Println(nilMap.Len())
+	//=> 0
+
 	// Clear all entries
 	om.Clear()
 
