@@ -161,7 +161,7 @@ func (om *Map[K, V]) DeleteOk(k K) (V, bool) {
 	}
 }
 
-func (om *Map[K, V]) Rename(oldK K, newK K) bool {
+func (om *Map[K, V]) RenameKey(oldK K, newK K) bool {
 	om.mu.Lock()
 	defer om.mu.Unlock()
 

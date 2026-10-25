@@ -121,7 +121,7 @@ func main() {
 }
 ```
 
-## Rename
+## RenameKey
 
 ```go
 package main
@@ -138,13 +138,13 @@ func main() {
 	om.Set("bar", 2)
 	om.Set("baz", 3)
 
-	// Rename changes a key while keeping its position
-	ok := om.Rename("bar", "zoo")
+	// RenameKey changes a key while keeping its position
+	ok := om.RenameKey("bar", "zoo")
 	fmt.Println(ok, om)
 	//=> true *orderedmap.Map[string,int][foo:1 zoo:2 baz:3]
 
-	// Rename returns false if the old key is missing or the new key already exists
-	ok = om.Rename("foo", "baz")
+	// RenameKey returns false if the old key is missing or the new key already exists
+	ok = om.RenameKey("foo", "baz")
 	fmt.Println(ok, om)
 	//=> false *orderedmap.Map[string,int][foo:1 zoo:2 baz:3]
 }

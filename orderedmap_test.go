@@ -437,7 +437,7 @@ func TestDeleteOK(t *testing.T) {
 	}
 }
 
-func TestRename(t *testing.T) {
+func TestRenameKey(t *testing.T) {
 	tests := []struct {
 		name     string
 		init     []pair[int]
@@ -494,7 +494,7 @@ func TestRename(t *testing.T) {
 			for _, p := range tt.init {
 				om.Set(p.k, p.v)
 			}
-			assert.Equal(t, tt.ok, om.Rename(tt.oldK, tt.newK))
+			assert.Equal(t, tt.ok, om.RenameKey(tt.oldK, tt.newK))
 			assert.Equal(t, tt.expected, mapToPairs(t, om))
 			assert.Equal(t, len(tt.expected), om.Len())
 			if tt.ok && tt.oldK != tt.newK {
@@ -507,12 +507,12 @@ func TestRename(t *testing.T) {
 	}
 }
 
-func TestRenameThenDelete(t *testing.T) {
+func TestRenameKeyThenDelete(t *testing.T) {
 	om := orderedmap.New[string, int]()
 	om.Set("foo", 100)
 	om.Set("bar", 200)
 	om.Set("zoo", 300)
-	assert.True(t, om.Rename("bar", "baz"))
+	assert.True(t, om.RenameKey("bar", "baz"))
 	om.Delete("baz")
 	om.Set("bar", 400)
 	assert.Equal(t, []pair[int]{{k: "foo", v: 100}, {k: "zoo", v: 300}, {k: "bar", v: 400}}, mapToPairs(t, om))
