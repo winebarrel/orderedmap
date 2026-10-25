@@ -166,6 +166,7 @@ package main
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/winebarrel/orderedmap/v2"
 )
@@ -192,6 +193,21 @@ func main() {
 	})
 	fmt.Println(ss)
 	//=> [foo=1 bar=2 baz=3]
+
+	// TransformMap returns a new map with transformed keys and values
+	om2 := om.TransformMap(func(k string, v int) (string, string) {
+		return strings.ToUpper(k), fmt.Sprintf("%d", v*10)
+	})
+	fmt.Println(om2)
+	//=> *orderedmap.Map[string,string][FOO:10 BAR:20 BAZ:30]
+
+	// If keys collide, the result follows Set:
+	// the entry keeps the position of the first key and the value of the last one
+	om3 := om.TransformMap(func(k string, v int) (string, int) {
+		return k[:1], v
+	})
+	fmt.Println(om3)
+	//=> *orderedmap.Map[string,int][f:1 b:3]
 }
 ```
 
