@@ -792,6 +792,68 @@ func TestTransformSlice(t *testing.T) {
 	}
 }
 
+func TestTransformMap(t *testing.T) {
+	tests := []struct {
+		name     string
+		init     []pair[int]
+		expected []pair[string]
+		f        func(string, int) (string, string)
+	}{
+		{
+			name:     "empty",
+			init:     []pair[int]{},
+			expected: []pair[string]{},
+			f:        func(k string, v int) (string, string) { return k, strconv.Itoa(v) },
+		},
+		{
+			name:     "values",
+			init:     []pair[int]{{k: "foo", v: 100}, {k: "bar", v: 200}, {k: "zoo", v: 300}},
+			expected: []pair[string]{{k: "foo", v: "101"}, {k: "bar", v: "201"}, {k: "zoo", v: "301"}},
+			f:        func(k string, v int) (string, string) { return k, strconv.Itoa(v + 1) },
+		},
+		{
+			name:     "keys",
+			init:     []pair[int]{{k: "foo", v: 100}, {k: "bar", v: 200}, {k: "zoo", v: 300}},
+			expected: []pair[string]{{k: "foofoo", v: "100"}, {k: "barbar", v: "200"}, {k: "zoozoo", v: "300"}},
+			f:        func(k string, v int) (string, string) { return k + k, strconv.Itoa(v) },
+		},
+		{
+			name:     "duplicate keys",
+			init:     []pair[int]{{k: "foo", v: 100}, {k: "bar", v: 200}, {k: "zoo", v: 300}},
+			expected: []pair[string]{{k: "x", v: "200"}, {k: "zoo", v: "300"}},
+			f: func(k string, v int) (string, string) {
+				if k == "zoo" {
+					return k, strconv.Itoa(v)
+				}
+				return "x", strconv.Itoa(v)
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			om := orderedmap.New[string, int]()
+			for _, p := range tt.init {
+				om.Set(p.k, p.v)
+			}
+			om2 := orderedmap.TransformMap(om, tt.f)
+			assert.Equal(t, tt.expected, mapToPairs(t, om2))
+			om2 = om.TransformMap(tt.f)
+			assert.Equal(t, tt.expected, mapToPairs(t, om2))
+			assert.Equal(t, tt.init, mapToPairs(t, om))
+		})
+	}
+}
+
+func TestTransformMapKeyType(t *testing.T) {
+	om := orderedmap.New[string, int]()
+	om.Set("foo", 100)
+	om.Set("bar", 200)
+	om2 := om.TransformMap(func(k string, v int) (int, string) { return v, k })
+	assert.Equal(t, []int{100, 200}, om2.CollectKeys())
+	assert.Equal(t, []string{"foo", "bar"}, om2.CollectValues())
+}
+
 func TestString(t *testing.T) {
 	tests := []struct {
 		name     string

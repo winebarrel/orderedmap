@@ -92,6 +92,20 @@ func (om *Map[K, V]) Filter(f func(k K, v V) bool) *Map[K, V] {
 	return om2
 }
 
+func TransformMap[K comparable, V any, K2 comparable, V2 any](om *Map[K, V], f func(k K, v V) (K2, V2)) *Map[K2, V2] {
+	om2 := New[K2, V2]()
+
+	for k, v := range om.All() {
+		om2.set0(f(k, v))
+	}
+
+	return om2
+}
+
+func (om *Map[K, V]) TransformMap[K2 comparable, V2 any](f func(k K, v V) (K2, V2)) *Map[K2, V2] {
+	return TransformMap(om, f)
+}
+
 func (om *Map[K, V]) Set(k K, v V) {
 	om.mu.Lock()
 	defer om.mu.Unlock()
