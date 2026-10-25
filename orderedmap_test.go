@@ -369,6 +369,43 @@ func TestGetOK(t *testing.T) {
 	}
 }
 
+func TestHas(t *testing.T) {
+	tests := []struct {
+		name     string
+		init     []pair[any]
+		has      []string
+		expected []bool
+	}{
+		{
+			name:     "empty",
+			init:     []pair[any]{},
+			has:      []string{"foo"},
+			expected: []bool{false},
+		},
+		{
+			name:     "has key",
+			init:     []pair[any]{{k: "foo", v: "bar"}, {k: "baz", v: nil}},
+			has:      []string{"foo", "bar", "baz"},
+			expected: []bool{true, false, true},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			om := orderedmap.New[string, any]()
+			for _, p := range tt.init {
+				om.Set(p.k, p.v)
+			}
+			actual := []bool{}
+			for _, k := range tt.has {
+				actual = append(actual, om.Has(k))
+			}
+			assert.Equal(t, tt.expected, actual)
+			assert.Equal(t, tt.init, mapToPairs(t, om))
+		})
+	}
+}
+
 func TestDelete(t *testing.T) {
 	tests := []struct {
 		name           string

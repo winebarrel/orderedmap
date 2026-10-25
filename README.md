@@ -46,6 +46,10 @@ func main() {
 	fmt.Println(v, ok)
 	//=> bar true
 
+	// Check if a key exists
+	fmt.Println(om.Has("foo"))
+	//=> true
+
 	// Iterate over key-value pairs in insertion order
 	for k, v := range om.All() {
 		fmt.Println(k, v)
