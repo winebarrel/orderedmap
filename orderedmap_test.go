@@ -69,6 +69,11 @@ func TestLen(t *testing.T) {
 	}
 }
 
+func TestLenNil(t *testing.T) {
+	var om *orderedmap.Map[string, any]
+	assert.Equal(t, 0, om.Len())
+}
+
 func TestClone(t *testing.T) {
 	tests := []struct {
 		name string
