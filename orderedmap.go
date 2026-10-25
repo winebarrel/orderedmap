@@ -145,6 +145,11 @@ func (om *Map[K, V]) GetOk(k K) (V, bool) {
 	}
 }
 
+func (om *Map[K, V]) Has(k K) bool {
+	_, ok := om.GetOk(k)
+	return ok
+}
+
 func (om *Map[K, V]) Delete(k K) V {
 	v, _ := om.DeleteOk(k)
 	return v
