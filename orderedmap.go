@@ -184,30 +184,6 @@ func (om *Map[K, V]) DeleteOk(k K) (V, bool) {
 	}
 }
 
-func (om *Map[K, V]) RenameKey(oldK K, newK K) bool {
-	om.mu.Lock()
-	defer om.mu.Unlock()
-
-	e, ok := om.elementByKey[oldK]
-	if !ok {
-		return false
-	}
-
-	if oldK == newK {
-		return true
-	}
-
-	if _, exists := om.elementByKey[newK]; exists {
-		return false
-	}
-
-	e.Value = &Pair[K, V]{Key: newK, Value: e.Value.Value}
-	delete(om.elementByKey, oldK)
-	om.elementByKey[newK] = e
-
-	return true
-}
-
 func (om *Map[K, V]) Clear() {
 	om.mu.Lock()
 	defer om.mu.Unlock()
