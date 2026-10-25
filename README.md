@@ -121,6 +121,35 @@ func main() {
 }
 ```
 
+## RenameKey
+
+```go
+package main
+
+import (
+	"fmt"
+
+	"github.com/winebarrel/orderedmap/v2"
+)
+
+func main() {
+	om := orderedmap.New[string, int]()
+	om.Set("foo", 1)
+	om.Set("bar", 2)
+	om.Set("baz", 3)
+
+	// RenameKey changes a key while keeping its position
+	ok := om.RenameKey("bar", "zoo")
+	fmt.Println(ok, om)
+	//=> true *orderedmap.Map[string,int][foo:1 zoo:2 baz:3]
+
+	// RenameKey returns false if the old key is missing or the new key already exists
+	ok = om.RenameKey("foo", "baz")
+	fmt.Println(ok, om)
+	//=> false *orderedmap.Map[string,int][foo:1 zoo:2 baz:3]
+}
+```
+
 ## Transform
 
 ```go

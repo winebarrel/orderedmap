@@ -437,6 +437,87 @@ func TestDeleteOK(t *testing.T) {
 	}
 }
 
+func TestRenameKey(t *testing.T) {
+	tests := []struct {
+		name     string
+		init     []pair[int]
+		oldK     string
+		newK     string
+		ok       bool
+		expected []pair[int]
+	}{
+		{
+			name:     "empty",
+			init:     []pair[int]{},
+			oldK:     "foo",
+			newK:     "bar",
+			ok:       false,
+			expected: []pair[int]{},
+		},
+		{
+			name:     "keep position",
+			init:     []pair[int]{{k: "foo", v: 100}, {k: "bar", v: 200}, {k: "zoo", v: 300}},
+			oldK:     "bar",
+			newK:     "baz",
+			ok:       true,
+			expected: []pair[int]{{k: "foo", v: 100}, {k: "baz", v: 200}, {k: "zoo", v: 300}},
+		},
+		{
+			name:     "missing key",
+			init:     []pair[int]{{k: "foo", v: 100}, {k: "bar", v: 200}},
+			oldK:     "zoo",
+			newK:     "baz",
+			ok:       false,
+			expected: []pair[int]{{k: "foo", v: 100}, {k: "bar", v: 200}},
+		},
+		{
+			name:     "new key exists",
+			init:     []pair[int]{{k: "foo", v: 100}, {k: "bar", v: 200}},
+			oldK:     "foo",
+			newK:     "bar",
+			ok:       false,
+			expected: []pair[int]{{k: "foo", v: 100}, {k: "bar", v: 200}},
+		},
+		{
+			name:     "same key",
+			init:     []pair[int]{{k: "foo", v: 100}, {k: "bar", v: 200}},
+			oldK:     "foo",
+			newK:     "foo",
+			ok:       true,
+			expected: []pair[int]{{k: "foo", v: 100}, {k: "bar", v: 200}},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			om := orderedmap.New[string, int]()
+			for _, p := range tt.init {
+				om.Set(p.k, p.v)
+			}
+			assert.Equal(t, tt.ok, om.RenameKey(tt.oldK, tt.newK))
+			assert.Equal(t, tt.expected, mapToPairs(t, om))
+			assert.Equal(t, len(tt.expected), om.Len())
+			if tt.ok && tt.oldK != tt.newK {
+				_, ok := om.GetOk(tt.oldK)
+				assert.False(t, ok)
+				_, ok = om.GetOk(tt.newK)
+				assert.True(t, ok)
+			}
+		})
+	}
+}
+
+func TestRenameKeyThenDelete(t *testing.T) {
+	om := orderedmap.New[string, int]()
+	om.Set("foo", 100)
+	om.Set("bar", 200)
+	om.Set("zoo", 300)
+	assert.True(t, om.RenameKey("bar", "baz"))
+	om.Delete("baz")
+	om.Set("bar", 400)
+	assert.Equal(t, []pair[int]{{k: "foo", v: 100}, {k: "zoo", v: 300}, {k: "bar", v: 400}}, mapToPairs(t, om))
+}
+
 func TestClear(t *testing.T) {
 	tests := []struct {
 		name        string
